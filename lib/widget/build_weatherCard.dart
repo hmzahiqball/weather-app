@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'dart:ui';
 
 class BuildWeathercard extends StatelessWidget {
-  final IconData icon;
   final String title;
   final String temp;
   final String description;
+  final IconData icon;
 
   const BuildWeathercard({
     required this.title,
@@ -13,6 +13,7 @@ class BuildWeathercard extends StatelessWidget {
     required this.description,
     required this.icon,
   });
+
   @override
   Widget build(BuildContext context) {
     return ClipRRect(
@@ -35,7 +36,7 @@ class BuildWeathercard extends StatelessWidget {
               Row(
                 children: [
                   Icon(
-                    Icons.wb_sunny,
+                    icon,
                     color: Colors.white.withOpacity(0.9),
                     size: 20,
                   ),
@@ -74,3 +75,4 @@ class BuildWeathercard extends StatelessWidget {
     );
   }
 }
+

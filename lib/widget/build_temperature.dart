@@ -4,7 +4,7 @@ class BuildTemperature extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return const Text(
-      '29°',
+      '29',
       style: TextStyle(
         color: Colors.white,
         fontSize: 80,

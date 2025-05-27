@@ -4,7 +4,7 @@ class BuildHeader extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(20.0),
+      padding: const EdgeInsets.all(10.0),
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
@@ -22,13 +22,6 @@ class BuildHeader extends StatelessWidget {
                 onPressed: () {},
                 icon: const Icon(
                   Icons.menu,
-                  color: Colors.white,
-                ),
-              ),
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(
-                  Icons.refresh,
                   color: Colors.white,
                 ),
               ),

@@ -1,36 +1,85 @@
 import 'package:flutter/material.dart';
-import 'dart:ui';
-import 'build_hourlyItem.dart';
+import 'package:weather_app/painter/TemperaturePainter.dart';
 
-class BuildHourlyForecast extends StatelessWidget {
+class BuildForecastWithTemperatureDiagram extends StatelessWidget {
+  final List<String> hours = ['11:00', '12:00', '13:00', '14:00', '15:00', '16:00', '17:00'];
+  final List<IconData> weatherIcons = [
+    Icons.wb_sunny,
+    Icons.wb_sunny,
+    Icons.wb_sunny,
+    Icons.wb_sunny,
+    Icons.wb_sunny,
+    Icons.wb_sunny,
+    Icons.wb_sunny,
+  ];
+  final List<int> temperatures = [29, 29, 30, 30, 29, 28, 26];
+
   @override
   Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 20),
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(16),
-        child: BackdropFilter(
-          filter: ImageFilter.blur(sigmaX: 10, sigmaY: 10),
-          child: Container(
-            padding: const EdgeInsets.all(16),
-            decoration: BoxDecoration(
-              color: Colors.white.withOpacity(0.15),
-              borderRadius: BorderRadius.circular(16),
-              border: Border.all(
-                color: Colors.white.withOpacity(0.3),
-                width: 1,
+    final double itemWidth = 60.0;
+    final double totalWidth = itemWidth * temperatures.length;
+
+    return Container(
+      height: 200,
+      child: SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        padding: const EdgeInsets.symmetric(horizontal: 20),
+        child: Container(
+          width: totalWidth,
+          child: Stack(
+            children: [
+              // Background temperature diagram (garis dan titik dengan suhu)
+              Positioned(
+                top: 0,
+                left: 0,
+                child: CustomPaint(
+                  size: Size(totalWidth, 100),
+                  painter: ImprovedTemperaturePainter(
+                    temperatures: temperatures,
+                    itemWidth: itemWidth,
+                  ),
+                ),
               ),
-            ),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceAround,
-              children: [
-                const BuildHourlyitem(temp: '29°', isActive: true),
-                const BuildHourlyitem(temp: '29°', isActive: false),
-                const BuildHourlyitem(temp: '30°', isActive: false),
-                const BuildHourlyitem(temp: '30°', isActive: false),
-                const BuildHourlyitem(temp: '29°', isActive: false),
-              ],
-            ),
+              
+              // Overlay forecast items - sejajar dengan dots
+              ...List.generate(temperatures.length, (index) {
+                return Positioned(
+                  left: index * itemWidth, // Sejajar dengan calculation di painter
+                  top: 104, // Posisi di bawah grafik
+                  child: SizedBox(
+                    width: itemWidth,
+                    child: Column(
+                      mainAxisAlignment: MainAxisAlignment.center,
+                      children: [
+                        Icon(
+                          weatherIcons[index],
+                          color: Colors.yellow,
+                          size: 24,
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          'Cerah',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 12,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                        const SizedBox(height: 2),
+                        Text(
+                          hours[index],
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.7),
+                            fontSize: 11,
+                          ),
+                          textAlign: TextAlign.center,
+                        ),
+                      ],
+                    ),
+                  ),
+                );
+              }),
+            ],
           ),
         ),
       ),
