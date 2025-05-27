@@ -22,3 +22,11 @@ dev_dependencies:
 
 flutter:
   uses-material-design: true
+  
+  assets:
+    - assets/images/weather-storm.jpg
+    - assets/images/weather-day-partlycloudy.jpg
+    - assets/images/weather-day-cloudy.jpg
+    - assets/images/weather-day-sunny.jpg
+    - assets/images/weather-rainy.jpg
+    - assets/images/weather-fog.jpg
