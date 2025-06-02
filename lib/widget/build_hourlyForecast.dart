@@ -4,39 +4,35 @@ import 'package:flutter/services.dart';
 import 'package:weather_app/painter/TemperaturePainter.dart';
 import 'package:weather_app/utils/getIconDataFromString.dart';
 
-class BuildForecastWithTemperatureDiagram extends StatelessWidget {
+class BuildForecastWithTemperatureDiagram extends StatefulWidget {
+  @override
+  _BuildForecastWithTemperatureDiagramState createState() => _BuildForecastWithTemperatureDiagramState();
+}
+
+class _BuildForecastWithTemperatureDiagramState extends State<BuildForecastWithTemperatureDiagram> {
+  final ScrollController _scrollController = ScrollController();
+  final double itemWidth = 60.0;
+
   Future<Map<String, dynamic>> loadAllWeatherData() async {
-    final String response = await rootBundle.loadString(
-      'assets/json/dummy2.json',
-    );
+    final String response = await rootBundle.loadString('assets/json/dummy2.json');
     final data = json.decode(response);
 
     final String mappingResponse = await rootBundle.loadString('assets/json/weather_code.json');
     final Map<String, dynamic> mappingData = json.decode(mappingResponse);
 
-    // Ambil data cuaca
     final List<String> allTimeRaw = List<String>.from(data["hourly"]["time"]);
-    final List<String> allTime = allTimeRaw.map((time) {
-      return time.split('T').last; // ambil bagian setelah 'T' => '00:00'
-    }).toList();
+    final List<String> allTime = allTimeRaw.map((time) => time.split('T').last).toList();
 
     final List<int> allWeather = List<int>.from(data["hourly"]["weather_code"]);
     final List<int> allTemp = List<num>.from(data["hourly"]["temperature_2m"]).map((e) => e.round()).toList();
 
     final List<dynamic> weatherCodeMapping = mappingData["weather_code_mapping"];
-    final matchedWeather = allWeather.map(
-      (code) => weatherCodeMapping.firstWhere(
-        (entry) => entry["code"] == code,
-        orElse: () => {"desc": "Tidak diketahui"},
-      )["desc"],
+    final matchedWeather = allWeather.map((code) =>
+      weatherCodeMapping.firstWhere((entry) => entry["code"] == code, orElse: () => {"desc": "Tidak diketahui"})["desc"]
     ).toList();
 
-    
-    final matchedIcon = allWeather.map(
-      (code) => weatherCodeMapping.firstWhere(
-        (entry) => entry["code"] == code,
-        orElse: () => {"icon": "Tidak diketahui"},
-      )["icon"],
+    final matchedIcon = allWeather.map((code) =>
+      weatherCodeMapping.firstWhere((entry) => entry["code"] == code, orElse: () => {"icon": "Tidak diketahui"})["icon"]
     ).toList();
 
     return {
@@ -47,9 +43,25 @@ class BuildForecastWithTemperatureDiagram extends StatelessWidget {
     };
   }
 
+  void scrollToCurrentHour(List<String> allTime) {
+    final now = DateTime.now();
+    final nowHourStr = now.hour.toString().padLeft(2, '0') + ':00'; // contoh: "10:00"
+    final index = allTime.indexOf(nowHourStr);
+
+    if (index != -1) {
+      final position = index * itemWidth;
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _scrollController.animateTo(
+          position,
+          duration: Duration(milliseconds: 500),
+          curve: Curves.easeOut,
+        );
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
-
     return FutureBuilder<Map<String, dynamic>>(
       future: loadAllWeatherData(),
       builder: (context, snapshot) {
@@ -60,19 +72,21 @@ class BuildForecastWithTemperatureDiagram extends StatelessWidget {
           final List<IconData> allIcon = allIconn.map<IconData>((e) => getIconDataFromString(e)).toList();
           final List<int> allTemp = List<int>.from(snapshot.data!["allTemp"]);
 
-          final double itemWidth = 60.0;
           final double totalWidth = itemWidth * allTime.length;
+
+          // Trigger scroll ke jam sekarang
+          scrollToCurrentHour(allTime);
 
           return Container(
             height: 200,
             child: SingleChildScrollView(
               scrollDirection: Axis.horizontal,
+              controller: _scrollController,
               padding: const EdgeInsets.symmetric(horizontal: 20),
               child: Container(
                 width: totalWidth,
                 child: Stack(
                   children: [
-                    // Background temperature diagram (garis dan titik dengan suhu)
                     Positioned(
                       top: 0,
                       left: 0,
@@ -84,38 +98,26 @@ class BuildForecastWithTemperatureDiagram extends StatelessWidget {
                         ),
                       ),
                     ),
-                    
-                    // Overlay forecast items - sejajar dengan dots
                     ...List.generate(allTime.length, (index) {
                       return Positioned(
-                        left: index * itemWidth, // Sejajar dengan calculation di painter
-                        top: 104, // Posisi di bawah grafik
+                        left: index * itemWidth,
+                        top: 104,
                         child: SizedBox(
                           width: itemWidth,
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(
-                                allIcon[index],
-                                color: Colors.white.withOpacity(0.9),
-                                size: 24,
-                              ),
+                              Icon(allIcon[index], color: Colors.white.withOpacity(0.9), size: 24),
                               const SizedBox(height: 4),
                               Text(
                                 allWeather[index],
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.9),
-                                  fontSize: 12,
-                                ),
+                                style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12),
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 allTime[index],
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.7),
-                                  fontSize: 11,
-                                ),
+                                style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11),
                                 textAlign: TextAlign.center,
                               ),
                             ],
@@ -129,9 +131,7 @@ class BuildForecastWithTemperatureDiagram extends StatelessWidget {
             ),
           );
         } else {
-          return const Center(
-            child: CircularProgressIndicator(),
-          );
+          return const Center(child: CircularProgressIndicator());
         }
       },
     );
