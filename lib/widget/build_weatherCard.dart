@@ -38,7 +38,7 @@ class BuildWeathercard extends StatelessWidget {
                   Icon(
                     icon,
                     color: Colors.white.withOpacity(0.9),
-                    size: 20,
+                    size: 18,
                   ),
                   const SizedBox(width: 8),
                   Text(
@@ -56,7 +56,7 @@ class BuildWeathercard extends StatelessWidget {
                 temp,
                 style: const TextStyle(
                   color: Colors.white,
-                  fontSize: 18,
+                  fontSize: 17,
                   fontWeight: FontWeight.w600,
                 ),
               ),

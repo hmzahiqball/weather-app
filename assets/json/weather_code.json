@@ -1,0 +1,32 @@
+{
+    "weather_code_mapping": [
+      { "code": 0, "desc": "Clear sky", "icon": "Icons.wb_sunny" },
+      { "code": 1, "desc": "Mainly clear", "icon": "Icons.wb_sunny" },
+      { "code": 2, "desc": "Partly cloudy", "icon": "Icons.wb_cloudy" },
+      { "code": 3, "desc": "Overcast", "icon": "Icons.wb_cloudy" },
+      { "code": 45, "desc": "Fog", "icon": "Icons.foggy" },
+      { "code": 48, "desc": "Depositing rime fog", "icon": "Icons.foggy" },
+      { "code": 51, "desc": "Drizzle", "icon": "Icons.cloudy_snowing" },
+      { "code": 53, "desc": "Drizzle", "icon": "Icons.cloudy_snowing" },
+      { "code": 55, "desc": "Drizzle", "icon": "Icons.cloudy_snowing" },
+      { "code": 56, "desc": "Freezing Drizzle", "icon": "Icons.cloudy_snowing" },
+      { "code": 57, "desc": "Freezing Drizzle", "icon": "Icons.cloudy_snowing" },
+      { "code": 61, "desc": "Rain", "icon": "Icons.cloudy_snowing" },
+      { "code": 63, "desc": "Rain", "icon": "Icons.cloudy_snowing" },
+      { "code": 65, "desc": "Rain", "icon": "Icons.cloudy_snowing" },
+      { "code": 66, "desc": "Freezing Rain", "icon": "Icons.cloudy_snowing" },
+      { "code": 67, "desc": "Freezing Rain", "icon": "Icons.cloudy_snowing" },
+      { "code": 71, "desc": "Snow fall", "icon": "Icons.ac_unit" },
+      { "code": 73, "desc": "Snow fall", "icon": "Icons.ac_unit" },
+      { "code": 75, "desc": "Snow fall", "icon": "Icons.ac_unit" },
+      { "code": 77, "desc": "Snow grains", "icon": "Icons.ac_unit" },
+      { "code": 80, "desc": "Rain showers", "icon": "Icons.thunderstorm" },
+      { "code": 81, "desc": "Rain showers", "icon": "Icons.thunderstorm" },
+      { "code": 82, "desc": "Rain showers", "icon": "Icons.thunderstorm" },
+      { "code": 85, "desc": "Snow showers", "icon": "Icons.ac_unit" },
+      { "code": 86, "desc": "Snow showers", "icon": "Icons.ac_unit" },
+      { "code": 95, "desc": "Thunderstorm", "icon": "Icons.thunderstorm" },
+      { "code": 96, "desc": "Thunderstorm", "icon": "Icons.thunderstorm" },
+      { "code": 99, "desc": "Thunderstorm", "icon": "Icons.thunderstorm" }
+    ]
+}
