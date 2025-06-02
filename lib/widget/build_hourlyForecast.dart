@@ -79,53 +79,69 @@ class _BuildForecastWithTemperatureDiagramState extends State<BuildForecastWithT
 
           return Container(
             height: 200,
-            child: SingleChildScrollView(
-              scrollDirection: Axis.horizontal,
-              controller: _scrollController,
-              padding: const EdgeInsets.symmetric(horizontal: 20),
-              child: Container(
-                width: totalWidth,
-                child: Stack(
-                  children: [
-                    Positioned(
-                      top: 0,
-                      left: 0,
-                      child: CustomPaint(
-                        size: Size(totalWidth, 100),
-                        painter: ImprovedTemperaturePainter(
-                          temperatures: allTemp,
-                          itemWidth: itemWidth,
-                        ),
-                      ),
-                    ),
-                    ...List.generate(allTime.length, (index) {
-                      return Positioned(
-                        left: index * itemWidth,
-                        top: 104,
-                        child: SizedBox(
-                          width: itemWidth,
-                          child: Column(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: [
-                              Icon(allIcon[index], color: Colors.white.withOpacity(0.9), size: 24),
-                              const SizedBox(height: 4),
-                              Text(
-                                allWeather[index],
-                                style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12),
-                                textAlign: TextAlign.center,
-                              ),
-                              const SizedBox(height: 2),
-                              Text(
-                                allTime[index],
-                                style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11),
-                                textAlign: TextAlign.center,
-                              ),
-                            ],
+            child: ShaderMask(
+              shaderCallback: (Rect bounds) {
+                return LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Colors.white.withOpacity(0.0),
+                    Colors.white,                 
+                    Colors.white,                 
+                    Colors.white.withOpacity(0.0),
+                  ],
+                  stops: [0.0, 0.05, 0.95, 1.0],
+                  tileMode: TileMode.mirror,
+                ).createShader(bounds);
+              },
+              child: SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                controller: _scrollController,
+                padding: const EdgeInsets.symmetric(horizontal: 20),
+                child: Container(
+                  width: totalWidth,
+                  child: Stack(
+                    children: [
+                      Positioned(
+                        top: 0,
+                        left: 0,
+                        child: CustomPaint(
+                          size: Size(totalWidth, 100),
+                          painter: ImprovedTemperaturePainter(
+                            temperatures: allTemp,
+                            itemWidth: itemWidth,
                           ),
                         ),
-                      );
-                    }),
-                  ],
+                      ),
+                      ...List.generate(allTime.length, (index) {
+                        return Positioned(
+                          left: index * itemWidth,
+                          top: 104,
+                          child: SizedBox(
+                            width: itemWidth,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.center,
+                              children: [
+                                Icon(allIcon[index], color: Colors.white.withOpacity(0.9), size: 24),
+                                const SizedBox(height: 4),
+                                Text(
+                                  allWeather[index],
+                                  style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12),
+                                  textAlign: TextAlign.center,
+                                ),
+                                const SizedBox(height: 2),
+                                Text(
+                                  allTime[index],
+                                  style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11),
+                                  textAlign: TextAlign.center,
+                                ),
+                              ],
+                            ),
+                          ),
+                        );
+                      }),
+                    ],
+                  ),
                 ),
               ),
             ),

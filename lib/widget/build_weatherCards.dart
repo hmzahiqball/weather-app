@@ -129,8 +129,15 @@ class BuildWeathercards extends StatelessWidget {
                     ShaderMask(
                       shaderCallback: (Rect bounds) {
                         return LinearGradient(
-                          colors: [Colors.white, Colors.white.withOpacity(0.05)],
-                          stops: [0.7, 1],
+                          begin: Alignment.centerLeft,
+                          end: Alignment.centerRight,
+                          colors: [
+                            Colors.white.withOpacity(0.0),
+                            Colors.white,                 
+                            Colors.white,                 
+                            Colors.white.withOpacity(0.0),
+                          ],
+                          stops: [0.0, 0.05, 0.95, 1.0],
                           tileMode: TileMode.mirror,
                         ).createShader(bounds);
                       },
@@ -167,53 +174,6 @@ class BuildWeathercards extends StatelessWidget {
           );
         }
       },
-    );
-  }
-}
-
-class FadeSideListView extends StatelessWidget {
-  const FadeSideListView({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Positioned.fill(
-      child: IgnorePointer(
-        ignoring: true, // biar nggak ganggu scroll
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-          children: [
-            // Fade kiri
-            Container(
-              width: 40,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerLeft,
-                  end: Alignment.centerRight,
-                  colors: [
-                    Color.fromARGB(137, 58, 58, 58),
-                    Color.fromARGB(40, 58, 58, 58).withOpacity(0.0),
-                  ],
-                ),
-              ),
-            ),
-            // Fade kanan
-            
-            Container(
-              width: 40,
-              decoration: BoxDecoration(
-                gradient: LinearGradient(
-                  begin: Alignment.centerRight,
-                  end: Alignment.centerLeft,
-                  colors: [
-                    Color.fromARGB(137, 58, 58, 58),
-                    Color.fromARGB(40, 58, 58, 58).withOpacity(0.0),
-                  ],
-                ),
-              ),
-            ),
-          ],
-        ),
-      ),
     );
   }
 }
