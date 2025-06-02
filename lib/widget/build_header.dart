@@ -2,28 +2,47 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
+import 'package:geolocator/geolocator.dart';
 
 class BuildHeader extends StatelessWidget {
   Future<String> _loadLocation() async {
     try {
-      final String response = await rootBundle.loadString(
-        'assets/json/dummy2.json',
-      );
-      final data = json.decode(response);
-
-      double lat = -6.9614;
-      double lon = 107.5875;
-      final result = getCityFromCoordinates(
-        // data['latitude'],
-        lat,
-        // data['longitude'],
-        lon
-      );
-      return result;
+      Position position = await _determinePosition();
+      return await getCityFromCoordinates(position.latitude, position.longitude);
     } catch (e) {
-      print(e);
-      return "Unknown";
+      print("GPS gagal, fallback ke IP Geolocation");
+      try {
+        final ipRes = await http.get(Uri.parse('http://ip-api.com/json/'));
+        final ipData = json.decode(ipRes.body);
+        double lat = ipData['lat'];
+        double lon = ipData['lon'];
+        return await getCityFromCoordinates(lat, lon);
+      } catch (e) {
+        print("IP Geolocation gagal juga: $e");
+        return "Unknown";
+      }
     }
+  }
+
+  Future<Position> _determinePosition() async {
+    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!serviceEnabled) {
+      throw Exception('Location services are disabled.');
+    }
+
+    LocationPermission permission = await Geolocator.checkPermission();
+    if (permission == LocationPermission.denied) {
+      permission = await Geolocator.requestPermission();
+      if (permission == LocationPermission.denied) {
+        throw Exception('Location permissions are denied');
+      }
+    }
+
+    if (permission == LocationPermission.deniedForever) {
+      throw Exception('Location permissions are permanently denied');
+    }
+
+    return await Geolocator.getCurrentPosition();
   }
 
   Future<String> getCityFromCoordinates(double lat, double lon) async {
