@@ -1,19 +1,46 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:http/http.dart' as http;
 
 class BuildHeader extends StatelessWidget {
-  Future<Map<String, double>> _loadLocation() async {
+  Future<String> _loadLocation() async {
     try {
       final String response = await rootBundle.loadString(
         'assets/json/dummy2.json',
       );
       final data = json.decode(response);
-      // List<Placemark> placemarks = await placemarkFromCoordinates(52.2165157, 6.9437819);
-      return {'latitude': data['latitude'], 'longitude': data['longitude']};
+
+      double lat = -6.9614;
+      double lon = 107.5875;
+      final result = getCityFromCoordinates(
+        // data['latitude'],
+        lat,
+        // data['longitude'],
+        lon
+      );
+      return result;
     } catch (e) {
       print(e);
-      return {'latitude': 0.0, 'longitude': 0.0};
+      return "Unknown";
+    }
+  }
+
+  Future<String> getCityFromCoordinates(double lat, double lon) async {
+    try {
+      final url =
+          'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=$lat&longitude=$lon&localityLanguage=id';
+
+      final response = await http.get(Uri.parse(url));
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        return data['city'] ?? 'Kota tidak ditemukan';
+      } else {
+        return 'Gagal ambil kota';
+      }
+    } catch (e) {
+      print('Error getCityFromCoordinates: $e');
+      return 'Error';
     }
   }
 
@@ -29,7 +56,7 @@ class BuildHeader extends StatelessWidget {
             builder: (context, snapshot) {
               if (snapshot.hasData) {
                 return Text(
-                  '(${snapshot.data!['latitude']}, ${snapshot.data!['longitude']})',
+                  '${snapshot.data}',
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
