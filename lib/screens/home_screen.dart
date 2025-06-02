@@ -6,6 +6,7 @@ import 'package:weather_app/widget/build_header.dart';
 import 'package:weather_app/widget/build_temperature.dart';
 import 'package:weather_app/widget/build_weatherDesc.dart';
 import 'package:weather_app/widget/build_weatherCards.dart';
+import 'package:weather_app/widget/build_dailyMinMax.dart';
 
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
@@ -91,6 +92,8 @@ class HomeScreen extends StatelessWidget {
                           BuildWeatherdescription(),
                           const SizedBox(height: 20),
                           BuildWeathercards(),
+                          const SizedBox(height: 24),
+                          BuildDailyminmax(),
                           const SizedBox(height: 24),
                         ],
                       ),
