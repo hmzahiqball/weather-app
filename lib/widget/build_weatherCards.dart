@@ -95,7 +95,8 @@ class BuildWeathercards extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
               child: Container(
                 decoration: BoxDecoration(
-                  color: Colors.white.withOpacity(0.1), // semi-transparent
+                  // color: Colors.white.withOpacity(0.1), // semi-transparent
+                  color: const Color.fromARGB(40, 58, 58, 58),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: Colors.white.withOpacity(0.2)),
                 ),
@@ -114,7 +115,7 @@ class BuildWeathercards extends StatelessWidget {
                           ),
                           const SizedBox(width: 8),
                           Text(
-                            '72 Jam Berikutnya',
+                            '7 Hari Berikutnya',
                             style: TextStyle(
                               color: Colors.white.withOpacity(0.8),
                               fontSize: 14,
@@ -125,28 +126,34 @@ class BuildWeathercards extends StatelessWidget {
                     ),
                     const SizedBox(height: 16),
                     // Scrollable weather cards
-                    SizedBox(
-                      height: 110,
-                      child: ListView.builder(
-                        physics: BouncingScrollPhysics(),
-                        scrollDirection: Axis.horizontal,
-                        padding: const EdgeInsets.symmetric(horizontal: 20),
-                        itemCount: 7,
-                        itemBuilder: (context, index) {
-                          return Container(
-                            width: 160,
-                            margin: EdgeInsets.only(right: index < 6 ? 12 : 0),
-                            child: BuildWeathercard(
-                              title: snapshot.data!["allTime"][index],
-                              temp:
-                                  "${snapshot.data!["allMin"][index]}°/${snapshot.data!["allMax"][index]}°",
-                              description: snapshot.data!["allWeather"][index],
-                              icon: getIconDataFromString(
-                                snapshot.data!["allIcon"][index],
+                    ShaderMask(
+                      shaderCallback: (Rect bounds) {
+                        return LinearGradient(
+                          colors: [Colors.white, Colors.white.withOpacity(0.05)],
+                          stops: [0.7, 1],
+                          tileMode: TileMode.mirror,
+                        ).createShader(bounds);
+                      },
+                      child: SizedBox(
+                        height: 110,
+                        child: ListView.builder(
+                          physics: BouncingScrollPhysics(),
+                          scrollDirection: Axis.horizontal,
+                          padding: const EdgeInsets.symmetric(horizontal: 20),
+                          itemCount: 7,
+                          itemBuilder: (context, index) {
+                            return Container(
+                              width: 160,
+                              margin: EdgeInsets.only(right: index < 6 ? 12 : 0),
+                              child: BuildWeathercard(
+                                title: snapshot.data!["allTime"][index],
+                                temp: "${snapshot.data!["allMin"][index]}°/${snapshot.data!["allMax"][index]}°",
+                                description: snapshot.data!["allWeather"][index],
+                                icon: getIconDataFromString(snapshot.data!["allIcon"][index]),
                               ),
-                            ),
-                          );
-                        },
+                            );
+                          },
+                        ),
                       ),
                     ),
                     const SizedBox(height: 24),
@@ -160,6 +167,53 @@ class BuildWeathercards extends StatelessWidget {
           );
         }
       },
+    );
+  }
+}
+
+class FadeSideListView extends StatelessWidget {
+  const FadeSideListView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Positioned.fill(
+      child: IgnorePointer(
+        ignoring: true, // biar nggak ganggu scroll
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+          children: [
+            // Fade kiri
+            Container(
+              width: 40,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerLeft,
+                  end: Alignment.centerRight,
+                  colors: [
+                    Color.fromARGB(137, 58, 58, 58),
+                    Color.fromARGB(40, 58, 58, 58).withOpacity(0.0),
+                  ],
+                ),
+              ),
+            ),
+            // Fade kanan
+            
+            Container(
+              width: 40,
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.centerRight,
+                  end: Alignment.centerLeft,
+                  colors: [
+                    Color.fromARGB(137, 58, 58, 58),
+                    Color.fromARGB(40, 58, 58, 58).withOpacity(0.0),
+                  ],
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
     );
   }
 }

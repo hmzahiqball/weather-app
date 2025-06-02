@@ -6,6 +6,8 @@ IconData getIconDataFromString(String iconName) {
       return Icons.wb_sunny;
     case 'Icons.wb_cloudy':
       return Icons.wb_cloudy;
+    case 'Icons.wb_twilight':
+      return Icons.wb_twilight;
     case 'Icons.foggy':
       return Icons.foggy;
     case 'Icons.cloudy_snowing':

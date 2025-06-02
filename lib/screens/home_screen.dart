@@ -8,7 +8,7 @@ import 'package:weather_app/widget/build_weatherDesc.dart';
 import 'package:weather_app/widget/build_weatherCards.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({Key? key}) : super(key: key);
+  const HomeScreen({super.key});
 
   // Ambil weatherCode terbaru dari dummy2.json
   Future<int> getLatestWeatherCode() async {

@@ -2,7 +2,7 @@
     "weather_code_mapping": [
       { "code": 0, "desc": "Clear sky", "icon": "Icons.wb_sunny" },
       { "code": 1, "desc": "Mainly clear", "icon": "Icons.wb_sunny" },
-      { "code": 2, "desc": "Partly cloudy", "icon": "Icons.wb_cloudy" },
+      { "code": 2, "desc": "Partly cloudy", "icon": "Icons.wb_twilight" },
       { "code": 3, "desc": "Overcast", "icon": "Icons.wb_cloudy" },
       { "code": 45, "desc": "Fog", "icon": "Icons.foggy" },
       { "code": 48, "desc": "Depositing rime fog", "icon": "Icons.foggy" },
