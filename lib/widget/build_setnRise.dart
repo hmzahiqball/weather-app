@@ -4,7 +4,7 @@ import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:intl/intl.dart';
 
-class BuildIndexUV extends StatelessWidget {
+class BuildSetnrise extends StatelessWidget {
   Future<Map<String, dynamic>> loadAllWeatherData() async {
     try {
       final String response = await rootBundle.loadString(
@@ -18,10 +18,10 @@ class BuildIndexUV extends StatelessWidget {
       final indexNow = hourlyTimes.indexOf(now);
 
       // ambil data hourly
-      final uvIndex = data["hourly"]["uv_index"][indexNow];
+      final dailyHumidity = data["hourly"]["relative_humidity_2m"][indexNow];
 
       return {
-        "uvIndex": uvIndex,
+        "dailyHumidity": dailyHumidity,
       };
     } catch (e) {
       print(e);
@@ -29,32 +29,16 @@ class BuildIndexUV extends StatelessWidget {
     }
   }
 
-  String getIndexUvDescription(int uvIndex) { 
-    if (uvIndex < 3) { 
-      return "Indeks UV rendah"; 
-    } else if (uvIndex < 6) { 
-      return "Indeks UV sedang"; 
-    } else if (uvIndex < 8) { 
-      return "Indeks UV tinggi"; 
-    } else if (uvIndex < 11) { 
-      return "Indeks UV sangat tinggi"; 
+  String getHumidityDescription(int humidity) { 
+    if (humidity < 30) { 
+      return "Kelembaban udara sangat rendah"; 
+    } else if (humidity < 60) { 
+      return "Kelembaban udara sedang"; 
+    } else if (humidity < 80) { 
+      return "Kelembaban udara tinggi"; 
     } else { 
-      return "Indeks UV ekstrem"; 
+      return "Kelembaban udara sangat tinggi"; 
     } 
-  }
-
-  String getIndexUvSuggestion(int uvIndex) {
-    if (uvIndex < 3) {
-      return "Indeks UV rendah - Tidak perlu tindakan pencegahan khusus.";
-    } else if (uvIndex < 6) {
-      return "Indeks UV sedang - Disarankan menggunakan sunscreen.";
-    } else if (uvIndex < 8) {
-      return "Indeks UV tinggi - Gunakan sunscreen, topi, dan kacamata hitam.";
-    } else if (uvIndex < 11) {
-      return "Indeks UV sangat tinggi - Hindari sinar matahari langsung, gunakan sunscreen, payung, atau cari tempat teduh.";
-    } else {
-      return "Indeks UV ekstrem - Sangat berbahaya, hindari keluar rumah jika memungkinkan.";
-    }
   }
 
   @override
@@ -72,7 +56,7 @@ class BuildIndexUV extends StatelessWidget {
             ),
           );
         } else {
-          final uvIndex = snapshot.data?["uvIndex"].toInt() ?? 0;
+          final dailyHumidity = snapshot.data?["dailyHumidity"] ?? 0;
           return ClipRRect(
             borderRadius: BorderRadius.circular(24),
             child: BackdropFilter(
@@ -94,13 +78,13 @@ class BuildIndexUV extends StatelessWidget {
                         child: Row(
                           children: [
                             Icon(
-                              Icons.wb_sunny,
+                              Icons.water,
                               color: Colors.white.withOpacity(0.8),
                               size: 16,
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Indeks UV',
+                              'Kelembaban Udara',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.8),
                                 fontSize: 14,
@@ -117,17 +101,10 @@ class BuildIndexUV extends StatelessWidget {
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: '${uvIndex}',
+                              text: '${dailyHumidity}%',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.8),
                                 fontSize: 24,
-                              ),
-                            ),
-                            TextSpan(
-                              text: ' | ${getIndexUvDescription(uvIndex)}',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 14,
                               ),
                             ),
                           ],
@@ -138,7 +115,7 @@ class BuildIndexUV extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
-                        getIndexUvSuggestion(uvIndex),
+                        getHumidityDescription(dailyHumidity),
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.8),
                           fontSize: 12,
