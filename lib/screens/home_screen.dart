@@ -8,9 +8,25 @@ import 'package:weather_app/widget/build_weatherDesc.dart';
 import 'package:weather_app/widget/build_weatherCards.dart';
 import 'package:weather_app/widget/build_dailyMinMax.dart';
 import 'package:weather_app/widget/build_dailyRainSum.dart';
+import 'package:weather_app/widget/build_dailyWind.dart';
 
-class HomeScreen extends StatelessWidget {
+class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
+
+  @override
+  State<HomeScreen> createState() => _HomeScreenState();
+}
+
+class _HomeScreenState extends State<HomeScreen> {
+  late Future<int> _weatherCodeFuture;
+  late Future<String?> _weatherDescFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _weatherCodeFuture = getLatestWeatherCode();
+    _weatherDescFuture = _weatherCodeFuture.then((code) => getWeatherDesc(code));
+  }
 
   // Ambil weatherCode terbaru dari dummy2.json
   Future<int> getLatestWeatherCode() async {
@@ -96,23 +112,26 @@ class HomeScreen extends StatelessWidget {
                           const SizedBox(height: 24),
                           BuildDailyminmax(),
                           const SizedBox(height: 24),
-                          Row(
-                            children: [
-                              Expanded(
-                                flex: 1,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(right: 8.0),
-                                  child: BuildDailyRainSum(),
+                          IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: BuildDailyRainSum(),
+                                  ),
                                 ),
-                              ),
-                              Expanded(
-                                flex: 1,
-                                child: Padding(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  child: BuildDailyRainSum(),
+                                Expanded(
+                                  flex: 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: BuildDailyWind(),
+                                  ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
                         ],
                       ),
