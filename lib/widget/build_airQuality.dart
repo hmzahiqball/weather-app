@@ -4,11 +4,11 @@ import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:intl/intl.dart';
 
-class BuildDailyRainSum extends StatelessWidget {
+class BuildAirquality extends StatelessWidget {
   Future<Map<String, dynamic>> loadAllWeatherData() async {
     try {
       final String response = await rootBundle.loadString(
-        'assets/json/dummy2.json',
+        'assets/json/dummy.json',
       );
       final data = json.decode(response);
 
@@ -18,12 +18,10 @@ class BuildDailyRainSum extends StatelessWidget {
       final indexNow = hourlyTimes.indexOf(now);
 
       // ambil data hourly
-      final rainSum = data["hourly"]["precipitation"][indexNow];
-      final rainProbability = data["hourly"]["precipitation_probability"][indexNow];
+      final airQuality = data["hourly"]["us_aqi_pm2_5"][indexNow];
 
       return {
-        "totalRainSum": rainSum,
-        "totalrainProbability": rainProbability,
+        "airQuality": airQuality,
       };
     } catch (e) {
       print(e);
@@ -31,17 +29,17 @@ class BuildDailyRainSum extends StatelessWidget {
     }
   }
 
-  String getRainSumDescription(int rainSum) {
-    if (rainSum < 1) {
-      return "Cuaca akan cerah berawan, tetap waspada perubahan cuaca";
-    } else if (rainSum < 5) {
-      return "Diperkirakan Hujan ringan, sebaiknya sediakan payung";
-    } else if (rainSum < 10) {
-      return "Diperkirakan Hujan sedang, sebaiknya sediakan perlengkapan hujan";
-    } else if (rainSum < 20) {
-      return "Diperkirakan Hujan lebat, hati-hati terhadap kondisi yang licin";
+  String getAirQualityDescription(int airQuality) {
+    if (airQuality < 51) {
+      return "Kualitas Udara Baik";
+    } else if (airQuality < 101) {
+      return "Kualitas Udara Sedang";
+    } else if (airQuality < 151) {
+      return "Kualitas Udara Tidak Sehat";
+    } else if (airQuality < 201) {
+      return "Kualitas Udara Sangat Tidak Sehat";
     } else {
-      return "Hujan sangat lebat, waspadai bahaya banjir";
+      return "Kualitas Udara Berbahaya";
     }
   }
 
@@ -60,8 +58,7 @@ class BuildDailyRainSum extends StatelessWidget {
             ),
           );
         } else {
-          final totalRainSum = snapshot.data?["totalRainSum"] ?? 2.0;
-          final totalrainProbability = snapshot.data?["totalCloudCover"] ?? 0;
+          final airQuality = snapshot.data?["airQuality"] ?? 0;
           return ClipRRect(
             borderRadius: BorderRadius.circular(24),
             child: BackdropFilter(
@@ -83,30 +80,16 @@ class BuildDailyRainSum extends StatelessWidget {
                         child: Row(
                           children: [
                             Icon(
-                              Icons.water_drop,
+                              airQuality <= 50 ? Icons.water_drop : airQuality <= 100 ? Icons.water_drop_outlined : Icons.warning,
                               color: Colors.white.withOpacity(0.8),
                               size: 16,
                             ),
                             const SizedBox(width: 8),
-                            ShaderMask(
-                              shaderCallback: (Rect bounds) {
-                                return LinearGradient(
-                                  begin: Alignment.centerLeft,
-                                  end: Alignment.centerRight,
-                                  colors: [
-                                    Colors.white,
-                                    Colors.white.withOpacity(0.0),
-                                  ],
-                                  stops: [0.6, 1],
-                                  tileMode: TileMode.mirror,
-                                ).createShader(bounds);
-                              },
-                              child: Text(
-                                'Curah Hujan Kumulatif',
-                                style: TextStyle(
-                                  color: Colors.white.withOpacity(0.8),
-                                  fontSize: 14,
-                                ),
+                            Text(
+                              'Kualitas Udara',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 14,
                               ),
                             ),
                           ],
@@ -120,14 +103,14 @@ class BuildDailyRainSum extends StatelessWidget {
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: '${totalRainSum.toStringAsFixed(1)}',
+                              text: '${airQuality}',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.8),
                                 fontSize: 24,
                               ),
                             ),
                             TextSpan(
-                              text: ' mm | ${totalrainProbability}%',
+                              text: 'μg/m³',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.8),
                                 fontSize: 14,
@@ -141,7 +124,7 @@ class BuildDailyRainSum extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
-                        getRainSumDescription(totalRainSum.toInt()),
+                        getAirQualityDescription(airQuality),
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.8),
                           fontSize: 12,

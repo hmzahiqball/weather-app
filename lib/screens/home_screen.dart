@@ -9,6 +9,7 @@ import 'package:weather_app/widget/build_weatherCards.dart';
 import 'package:weather_app/widget/build_dailyMinMax.dart';
 import 'package:weather_app/widget/build_dailyRainSum.dart';
 import 'package:weather_app/widget/build_dailyWind.dart';
+import 'package:weather_app/widget/build_airQuality.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -30,6 +31,8 @@ class _HomeScreenState extends State<HomeScreen> {
 
   // Ambil weatherCode terbaru dari dummy2.json
   Future<int> getLatestWeatherCode() async {
+    // https://api.open-meteo.com/v1/forecast?latitude=-7.3993&longitude=108.2607&daily=weather_code,sunset,sunrise,temperature_2m_min,temperature_2m_max,rain_sum,wind_speed_10m_mean,wind_gusts_10m_mean,uv_index_max,cloud_cover_mean&hourly=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,cloud_cover,precipitation,precipitation_probability&current=weather_code,is_day,temperature_2m&timezone=auto
+    // https://air-quality-api.open-meteo.com/v1/air-quality?latitude=-7.3993&longitude=108.2607&hourly=us_aqi_pm2_5&timezone=auto
     final jsonString = await rootBundle.loadString('assets/json/dummy2.json');
     final data = json.decode(jsonString);
 
@@ -128,6 +131,28 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(left: 8.0),
                                     child: BuildDailyWind(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: BuildAirquality(),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: BuildAirquality(),
                                   ),
                                 ),
                               ],
