@@ -11,6 +11,7 @@ import 'package:weather_app/widget/build_dailyRainSum.dart';
 import 'package:weather_app/widget/build_dailyWind.dart';
 import 'package:weather_app/widget/build_airQuality.dart';
 import 'package:weather_app/widget/build_indexUV.dart';
+import 'package:weather_app/widget/build_dailyHumidity.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -145,6 +146,28 @@ class _HomeScreenState extends State<HomeScreen> {
                                   child: Padding(
                                     padding: const EdgeInsets.only(left: 8.0),
                                     child: BuildIndexUV(),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                          const SizedBox(height: 24),
+                          IntrinsicHeight(
+                            child: Row(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              children: [
+                                Expanded(
+                                  flex: 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(right: 8.0),
+                                    child: BuildDailyHumidity(),
+                                  ),
+                                ),
+                                Expanded(
+                                  flex: 1,
+                                  child: Padding(
+                                    padding: const EdgeInsets.only(left: 8.0),
+                                    child: BuildDailyHumidity(),
                                   ),
                                 ),
                               ],
