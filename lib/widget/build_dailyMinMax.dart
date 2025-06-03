@@ -125,7 +125,6 @@ class BuildDailyminmax extends StatelessWidget {
                     const SizedBox(height: 24),
                     // Temperature diagram
                     BuildForecastWithTemperatureDiagram(),
-                    const SizedBox(height: 20),
                   ],
                 ),
               ),

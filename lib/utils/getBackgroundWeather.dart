@@ -1,25 +1,21 @@
 String getWeatherBackground(String condition) {
   switch (condition) {
-    case 'Clear sky':
-    case 'Mainly clear':
+    case 'Langit Cerah':
+    case 'Cerah Berawan':
       return 'assets/images/weather-day-sunny.jpg';
-    case 'Overcast':
-    case 'Fog':
-    case 'Depositing rime fog':
+    case 'Kabut':
+    case 'Kabut Beku':
       return 'assets/images/weather-fog.jpg';
-    case 'Partly cloudy':
+    case 'Sebagian Berawan':
+    case 'Berawan':
       return 'assets/images/weather-day-partlycloudy.jpg';
-    case 'Drizzle: Light intensity':
-    case 'Drizzle: Moderate intensity':
-    case 'Drizzle: Dense intensity':
+    case 'Gerimis':
+    case 'Gerimis Beku':
       return 'assets/images/weather-day-cloudy.jpg';
-    case 'Rain: Slight intensity':
-    case 'Rain: Moderate intensity':
-    case 'Rain: Heavy intensity':
-    case 'Freezing Rain: Light intensity':
-    case 'Freezing Rain: Heavy intensity':
+    case 'Hujan':
+    case 'Hujan Beku':
       return 'assets/images/weather-rainy.jpg';
-    case 'badai':
+    case 'Badai':
       return 'assets/images/weather-storm.jpg';
     default:
       return 'assets/images/weather-day-sunny.jpg';
