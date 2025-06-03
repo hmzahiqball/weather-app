@@ -10,6 +10,7 @@ import 'package:weather_app/widget/build_dailyMinMax.dart';
 import 'package:weather_app/widget/build_dailyRainSum.dart';
 import 'package:weather_app/widget/build_dailyWind.dart';
 import 'package:weather_app/widget/build_airQuality.dart';
+import 'package:weather_app/widget/build_indexUV.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -19,19 +20,10 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  late Future<int> _weatherCodeFuture;
-  late Future<String?> _weatherDescFuture;
-
-  @override
-  void initState() {
-    super.initState();
-    _weatherCodeFuture = getLatestWeatherCode();
-    _weatherDescFuture = _weatherCodeFuture.then((code) => getWeatherDesc(code));
-  }
 
   // Ambil weatherCode terbaru dari dummy2.json
   Future<int> getLatestWeatherCode() async {
-    // https://api.open-meteo.com/v1/forecast?latitude=-7.3993&longitude=108.2607&daily=weather_code,sunset,sunrise,temperature_2m_min,temperature_2m_max,rain_sum,wind_speed_10m_mean,wind_gusts_10m_mean,uv_index_max,cloud_cover_mean&hourly=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,cloud_cover,precipitation,precipitation_probability&current=weather_code,is_day,temperature_2m&timezone=auto
+    // https://api.open-meteo.com/v1/forecast?latitude=-7.3993&longitude=108.2607&daily=weather_code,sunset,sunrise,temperature_2m_min,temperature_2m_max,rain_sum,wind_speed_10m_mean,wind_gusts_10m_mean,cloud_cover_mean&hourly=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,cloud_cover,precipitation,precipitation_probability,uv_index&current=weather_code,is_day,temperature_2m&timezone=auto
     // https://air-quality-api.open-meteo.com/v1/air-quality?latitude=-7.3993&longitude=108.2607&hourly=us_aqi_pm2_5&timezone=auto
     final jsonString = await rootBundle.loadString('assets/json/dummy2.json');
     final data = json.decode(jsonString);
@@ -152,7 +144,7 @@ class _HomeScreenState extends State<HomeScreen> {
                                   flex: 1,
                                   child: Padding(
                                     padding: const EdgeInsets.only(left: 8.0),
-                                    child: BuildAirquality(),
+                                    child: BuildIndexUV(),
                                   ),
                                 ),
                               ],
