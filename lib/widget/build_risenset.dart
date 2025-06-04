@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:intl/intl.dart';
+import 'package:weather_app/painter/SunPathPainter.dart';
 
 class BuildSetnrise extends StatelessWidget {
   Future<Map<String, dynamic>> loadAllWeatherData() async {
@@ -12,33 +13,23 @@ class BuildSetnrise extends StatelessWidget {
       );
       final data = json.decode(response);
 
-      // ambil waktu lokal sekarang dalam format yang cocok dengan hourly time
-      final now = DateFormat("yyyy-MM-ddTHH:00").format(DateTime.now());
-      final hourlyTimes = data["hourly"]["time"] as List;
-      final indexNow = hourlyTimes.indexOf(now);
+      // ambil tanggal hari ini dalam format yang cocok dengan daily time
+      final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
+      final dailyTimes = data["daily"]["time"] as List;
+      final indexToday = dailyTimes.indexOf(today);
 
-      // ambil data hourly
-      final dailyHumidity = data["hourly"]["relative_humidity_2m"][indexNow];
+      // ambil jam sunrise dan sunset
+      final sunriseHour = DateFormat("HH:mm").format(DateTime.parse(data["daily"]["sunrise"][indexToday]));
+      final sunsetHour = DateFormat("HH:mm").format(DateTime.parse(data["daily"]["sunset"][indexToday]));
 
       return {
-        "dailyHumidity": dailyHumidity,
+        "sunrise": sunriseHour,
+        "sunset": sunsetHour,
       };
     } catch (e) {
       print(e);
       return {};
     }
-  }
-
-  String getHumidityDescription(int humidity) { 
-    if (humidity < 30) { 
-      return "Kelembaban udara sangat rendah"; 
-    } else if (humidity < 60) { 
-      return "Kelembaban udara sedang"; 
-    } else if (humidity < 80) { 
-      return "Kelembaban udara tinggi"; 
-    } else { 
-      return "Kelembaban udara sangat tinggi"; 
-    } 
   }
 
   @override
@@ -56,7 +47,8 @@ class BuildSetnrise extends StatelessWidget {
             ),
           );
         } else {
-          final dailyHumidity = snapshot.data?["dailyHumidity"] ?? 0;
+          final sunrise = snapshot.data?["sunrise"] ?? 00.00;
+          final sunset = snapshot.data?["sunset"] ?? 00.00;
           return ClipRRect(
             borderRadius: BorderRadius.circular(24),
             child: BackdropFilter(
@@ -78,13 +70,13 @@ class BuildSetnrise extends StatelessWidget {
                         child: Row(
                           children: [
                             Icon(
-                              Icons.water,
+                              Icons.wb_sunny,
                               color: Colors.white.withOpacity(0.8),
                               size: 16,
                             ),
                             const SizedBox(width: 8),
                             Text(
-                              'Kelembaban Udara',
+                              'Sunrise - Sunset',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.8),
                                 fontSize: 14,
@@ -97,28 +89,23 @@ class BuildSetnrise extends StatelessWidget {
                     const SizedBox(height: 20),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: RichText(
-                        text: TextSpan(
-                          children: [
-                            TextSpan(
-                              text: '${dailyHumidity}%',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 24,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ),
+                      child: SunPathProgress(),
                     ),
-                    const SizedBox(height: 16),
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Text(
-                        getHumidityDescription(dailyHumidity),
-                        style: TextStyle(
-                          color: Colors.white.withOpacity(0.8),
-                          fontSize: 12,
+                      child: Center(
+                        child: RichText(
+                          text: TextSpan(
+                            children: [
+                              TextSpan(
+                                text: '${sunrise} - ${sunset}',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.8),
+                                  fontSize: 20,
+                                ),
+                              ),
+                            ],
+                          ),
                         ),
                       ),
                     ),
