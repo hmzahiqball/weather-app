@@ -8,31 +8,28 @@ import 'package:intl/intl.dart';
 class BuildDailyminmax extends StatelessWidget {
   Future<Map<String, dynamic>> loadAllWeatherData() async {
     try {
-      final String response = await rootBundle.loadString(
-        'assets/json/dummy2.json',
-      );
+      // Load JSON dummy data
+      final String response = await rootBundle.loadString('assets/json/dummy2.json');
       final data = json.decode(response);
 
-      final String mappingResponse = await rootBundle.loadString(
-        'assets/json/weather_code.json',
-      );
+      // Load weather code mapping
+      final String mappingResponse = await rootBundle.loadString('assets/json/weather_code.json');
       final Map<String, dynamic> mappingData = json.decode(mappingResponse);
 
-      // Ambil data cuaca
-      final List<String> allTime = List<String>.from(data["daily"]["time"]);
-
-      // Waktu sekarang
+      // Waktu sekarang + besok
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
       final tomorrow = today.add(Duration(days: 1));
 
-      // Helper untuk label hari
+      // Label hari
       String getDayLabel(DateTime date) {
         if (date == today) return "Hari ini";
         if (date == tomorrow) return "Besok";
-        return DateFormat.EEEE('id_ID').format(date); // Contoh: Senin, Selasa
+        return DateFormat.EEEE('id_ID').format(date);
       }
 
+      // Extract data harian
+      final List<String> allTime = List<String>.from(data["daily"]["time"]);
       final List<String> allTimeLabel = allTime.map((dateStr) {
         final date = DateTime.parse(dateStr);
         final currentDate = DateTime(date.year, date.month, date.day);
@@ -66,34 +63,40 @@ class BuildDailyminmax extends StatelessWidget {
         "allMin": allMin,
         "allMax": allMax,
       };
-    } catch (e) {
-      print(e);
-      return {};
+    } catch (e, stacktrace) {
+      debugPrint("⚠️ Error loadAllWeatherData: $e\n$stacktrace");
+      rethrow;
     }
   }
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
+    return FutureBuilder<Map<String, dynamic>>(
       future: loadAllWeatherData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
           return Center(
-            child: Text(
-              'Error loading temperature data',
-              style: TextStyle(color: Colors.white),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                Icon(Icons.error_outline, color: Colors.redAccent, size: 32),
+                const SizedBox(height: 8),
+                Text(
+                  'Gagal load data cuaca',
+                  style: TextStyle(color: Colors.white, fontSize: 14),
+                ),
+              ],
             ),
           );
-        } else {
+        } else if (snapshot.hasData) {
           return ClipRRect(
             borderRadius: BorderRadius.circular(24),
             child: BackdropFilter(
               filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
               child: Container(
                 decoration: BoxDecoration(
-                  // color: Colors.white.withOpacity(0.1), // semi-transparent
                   color: const Color.fromARGB(40, 58, 58, 58),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: Colors.white.withOpacity(0.2)),
@@ -106,30 +109,25 @@ class BuildDailyminmax extends StatelessWidget {
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Row(
                         children: [
-                          Icon(
-                            Icons.calendar_month,
-                            color: Colors.white.withOpacity(0.8),
-                            size: 16,
-                          ),
+                          Icon(Icons.calendar_month, color: Colors.white.withOpacity(0.8), size: 16),
                           const SizedBox(width: 8),
                           Text(
                             '7 Hari Berikutnya',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              fontSize: 14,
-                            ),
+                            style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
                           ),
                         ],
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Temperature diagram
+                    // Diagram suhu
                     BuildForecastWithTemperatureDiagram(),
                   ],
                 ),
               ),
             ),
           );
+        } else {
+          return const SizedBox(); // fallback
         }
       },
     );

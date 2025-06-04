@@ -4,32 +4,37 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class BuildTemperature extends StatelessWidget {
-  Future<int> _loadTemperature() async {
-    final String response = await rootBundle.loadString('assets/json/dummy2.json');
-    final data = json.decode(response);
+  const BuildTemperature({super.key});
 
-    // ambil waktu lokal sekarang dalam format yang cocok dengan hourly time
-    final now = DateFormat("yyyy-MM-ddTHH:00").format(DateTime.now());
+  Future<int> _getCurrentTemperature() async {
+    try {
+      final String jsonString = await rootBundle.loadString('assets/json/dummy2.json');
+      final Map<String, dynamic> jsonData = json.decode(jsonString);
 
-    final hourlyTimes = data["hourly"]["time"] as List;
-    final indexNow = hourlyTimes.indexOf(now);
+      final now = DateFormat("yyyy-MM-ddTHH:00").format(DateTime.now());
+      final List<dynamic> hourlyTime = jsonData["hourly"]["time"];
+      final List<dynamic> temperatures = jsonData["hourly"]["temperature_2m"];
 
-    if (indexNow == -1) {
-      throw Exception("Data jam sekarang (${now}) gak ketemu di hourly");
+      final int currentIndex = hourlyTime.indexOf(now);
+      if (currentIndex == -1) {
+        throw Exception("Waktu saat ini ($now) tidak ditemukan dalam data hourly.");
+      }
+
+      final dynamic temperature = temperatures[currentIndex];
+      return temperature.toInt();
+    } catch (e) {
+      debugPrint('Gagal load suhu: $e');
+      rethrow;
     }
-
-    final temperature = data["hourly"]["temperature_2m"][indexNow];
-
-    return temperature.toInt();
   }
 
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<int>(
-      future: _loadTemperature(),
+      future: _getCurrentTemperature(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const CircularProgressIndicator(color: Colors.white);
         } else if (snapshot.hasData) {
           return Container(
             margin: const EdgeInsets.only(left: 40),
@@ -43,7 +48,17 @@ class BuildTemperature extends StatelessWidget {
             ),
           );
         } else {
-          return const Text('Error ngambil data suhu haha');
+          return const Padding(
+            padding: EdgeInsets.only(left: 40),
+            child: Text(
+              'Error mendapatkan suhu',
+              style: TextStyle(
+                color: Colors.redAccent,
+                fontSize: 20,
+                fontWeight: FontWeight.w400,
+              ),
+            ),
+          );
         }
       },
     );

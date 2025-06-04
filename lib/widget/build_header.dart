@@ -5,47 +5,51 @@ import 'package:http/http.dart' as http;
 import 'package:geolocator/geolocator.dart';
 
 class BuildHeader extends StatelessWidget {
-  Future<String> _loadLocation() async {
+  const BuildHeader({super.key});
+
+  Future<String> _fetchLocation() async {
     try {
-      Position position = await _determinePosition();
-      return await getCityFromCoordinates(position.latitude, position.longitude);
+      final position = await _getCurrentPosition();
+      return await _getCityFromCoordinates(position.latitude, position.longitude);
     } catch (e) {
-      print("GPS gagal, fallback ke IP Geolocation");
+      debugPrint("GPS gagal, fallback ke IP Geolocation");
+
       try {
-        final ipRes = await http.get(Uri.parse('http://ip-api.com/json/'));
-        final ipData = json.decode(ipRes.body);
-        double lat = ipData['lat'];
-        double lon = ipData['lon'];
-        return await getCityFromCoordinates(lat, lon);
+        final response = await http.get(Uri.parse('http://ip-api.com/json/'));
+        final data = json.decode(response.body);
+        final double latitude = data['lat'];
+        final double longitude = data['lon'];
+
+        return await _getCityFromCoordinates(latitude, longitude);
       } catch (e) {
-        print("IP Geolocation gagal juga: $e");
+        debugPrint("IP Geolocation gagal juga: $e");
         return "Unknown";
       }
     }
   }
 
-  Future<Position> _determinePosition() async {
-    bool serviceEnabled = await Geolocator.isLocationServiceEnabled();
-    if (!serviceEnabled) {
+  Future<Position> _getCurrentPosition() async {
+    final isServiceEnabled = await Geolocator.isLocationServiceEnabled();
+    if (!isServiceEnabled) {
       throw Exception('Location services are disabled.');
     }
 
-    LocationPermission permission = await Geolocator.checkPermission();
+    var permission = await Geolocator.checkPermission();
     if (permission == LocationPermission.denied) {
       permission = await Geolocator.requestPermission();
       if (permission == LocationPermission.denied) {
-        throw Exception('Location permissions are denied');
+        throw Exception('Location permissions are denied.');
       }
     }
 
     if (permission == LocationPermission.deniedForever) {
-      throw Exception('Location permissions are permanently denied');
+      throw Exception('Location permissions are permanently denied.');
     }
 
     return await Geolocator.getCurrentPosition();
   }
 
-  Future<String> getCityFromCoordinates(double lat, double lon) async {
+  Future<String> _getCityFromCoordinates(double lat, double lon) async {
     try {
       final url =
           'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=$lat&longitude=$lon&localityLanguage=id';
@@ -58,7 +62,7 @@ class BuildHeader extends StatelessWidget {
         return 'Gagal ambil kota';
       }
     } catch (e) {
-      print('Error getCityFromCoordinates: $e');
+      debugPrint('Error saat ambil kota dari koordinat: $e');
       return 'Error';
     }
   }
@@ -70,12 +74,17 @@ class BuildHeader extends StatelessWidget {
       child: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
-          FutureBuilder(
-            future: _loadLocation(),
+          FutureBuilder<String>(
+            future: _fetchLocation(),
             builder: (context, snapshot) {
-              if (snapshot.hasData) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Text(
+                  'Memuat lokasi...',
+                  style: TextStyle(color: Colors.white),
+                );
+              } else if (snapshot.hasData) {
                 return Text(
-                  '${snapshot.data}',
+                  snapshot.data!,
                   style: const TextStyle(
                     color: Colors.white,
                     fontSize: 18,
@@ -83,17 +92,12 @@ class BuildHeader extends StatelessWidget {
                   ),
                 );
               } else {
-                return const Text('');
+                return const Text(
+                  'Lokasi tidak ditemukan',
+                  style: TextStyle(color: Colors.white),
+                );
               }
             },
-          ),
-          Row(
-            children: [
-              IconButton(
-                onPressed: () {},
-                icon: const Icon(Icons.menu, color: Colors.white),
-              ),
-            ],
           ),
         ],
       ),

@@ -10,29 +10,22 @@ import 'package:intl/intl.dart';
 class BuildWeathercards extends StatelessWidget {
   Future<Map<String, dynamic>> loadAllWeatherData() async {
     try {
-      final String response = await rootBundle.loadString(
-        'assets/json/dummy2.json',
-      );
+      final String response = await rootBundle.loadString('assets/json/dummy2.json');
       final data = json.decode(response);
 
-      final String mappingResponse = await rootBundle.loadString(
-        'assets/json/weather_code.json',
-      );
+      final String mappingResponse = await rootBundle.loadString('assets/json/weather_code.json');
       final Map<String, dynamic> mappingData = json.decode(mappingResponse);
 
-      // Ambil data cuaca
       final List<String> allTime = List<String>.from(data["daily"]["time"]);
 
-      // Waktu sekarang
       final now = DateTime.now();
       final today = DateTime(now.year, now.month, now.day);
       final tomorrow = today.add(Duration(days: 1));
 
-      // Helper untuk label hari
       String getDayLabel(DateTime date) {
         if (date == today) return "Hari ini";
         if (date == tomorrow) return "Besok";
-        return DateFormat.EEEE('id_ID').format(date); // Contoh: Senin, Selasa
+        return DateFormat.EEEE('id_ID').format(date);
       }
 
       final List<String> allTimeLabel = allTime.map((dateStr) {
@@ -69,8 +62,8 @@ class BuildWeathercards extends StatelessWidget {
         "allMax": allMax,
       };
     } catch (e) {
-      print(e);
-      return {};
+      debugPrint("Error loading weather data: $e");
+      return {}; // fallback
     }
   }
 
@@ -81,11 +74,12 @@ class BuildWeathercards extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
-        } else if (snapshot.hasError) {
+        } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+          // fallback UI pas data gagal di-load
           return Center(
             child: Text(
-              'Error loading temperature data',
-              style: TextStyle(color: Colors.white),
+              'Data cuaca gak tersedia 😓',
+              style: TextStyle(color: Colors.white, fontSize: 16),
             ),
           );
         } else {
@@ -95,7 +89,6 @@ class BuildWeathercards extends StatelessWidget {
               filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
               child: Container(
                 decoration: BoxDecoration(
-                  // color: Colors.white.withOpacity(0.1), // semi-transparent
                   color: const Color.fromARGB(40, 58, 58, 58),
                   borderRadius: BorderRadius.circular(24),
                   border: Border.all(color: Colors.white.withOpacity(0.2)),
@@ -125,7 +118,6 @@ class BuildWeathercards extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 16),
-                    // Scrollable weather cards
                     ShaderMask(
                       shaderCallback: (Rect bounds) {
                         return LinearGradient(
@@ -133,12 +125,11 @@ class BuildWeathercards extends StatelessWidget {
                           end: Alignment.centerRight,
                           colors: [
                             Colors.white.withOpacity(0.0),
-                            Colors.white,                 
-                            Colors.white,                 
+                            Colors.white,
+                            Colors.white,
                             Colors.white.withOpacity(0.0),
                           ],
                           stops: [0.0, 0.05, 0.95, 1.0],
-                          tileMode: TileMode.mirror,
                         ).createShader(bounds);
                       },
                       child: SizedBox(
@@ -164,7 +155,6 @@ class BuildWeathercards extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    // Temperature diagram
                     BuildForecastWithTemperatureDiagram(),
                     const SizedBox(height: 20),
                   ],

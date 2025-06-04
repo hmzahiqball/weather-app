@@ -12,12 +12,10 @@ class BuildAirquality extends StatelessWidget {
       );
       final data = json.decode(response);
 
-      // ambil waktu lokal sekarang dalam format yang cocok dengan hourly time
       final now = DateFormat("yyyy-MM-ddTHH:00").format(DateTime.now());
       final hourlyTimes = data["hourly"]["time"] as List;
       final indexNow = hourlyTimes.indexOf(now);
 
-      // ambil data hourly
       final airQuality = data["hourly"]["us_aqi_pm2_5"][indexNow];
 
       return {
@@ -29,18 +27,20 @@ class BuildAirquality extends StatelessWidget {
     }
   }
 
-  String getAirQualityDescription(int airQuality) {
-    if (airQuality < 51) {
-      return "Kualitas Udara Baik";
-    } else if (airQuality < 101) {
-      return "Kualitas Udara Sedang";
-    } else if (airQuality < 151) {
-      return "Kualitas Udara Tidak Sehat";
-    } else if (airQuality < 201) {
-      return "Kualitas Udara Sangat Tidak Sehat";
-    } else {
-      return "Kualitas Udara Berbahaya";
-    }
+  String getAirQualityLevel(int aqi) {
+    if (aqi < 51) return "Baik";
+    if (aqi < 101) return "Sedang";
+    if (aqi < 151) return "Tidak Sehat";
+    if (aqi < 201) return "Sangat Tidak Sehat";
+    return "Berbahaya";
+  }
+
+  String getAirQualityMessage(int aqi) {
+    if (aqi < 51) return "Udara bersih, aman buat semua aktivitas!";
+    if (aqi < 101) return "Kualitas udara sedang, masih aman tapi hati-hati buat yang sensitif."; 
+    if (aqi < 151) return "Udara agak kotor, disarankan kurangi aktivitas di luar.";
+    if (aqi < 201) return "Udara nggak sehat, pakai masker kalau ke luar ya.";
+    return "Udara berbahaya! Mending di rumah aja dan tutup jendela.";
   }
 
   @override
@@ -53,12 +53,15 @@ class BuildAirquality extends StatelessWidget {
         } else if (snapshot.hasError) {
           return Center(
             child: Text(
-              'Error loading rain data',
+              'Error loading air quality data',
               style: TextStyle(color: Colors.white),
             ),
           );
         } else {
           final airQuality = snapshot.data?["airQuality"] ?? 0;
+          final airQualityLevel = getAirQualityLevel(airQuality);
+          final airQualityMessage = getAirQualityMessage(airQuality);
+
           return ClipRRect(
             borderRadius: BorderRadius.circular(24),
             child: BackdropFilter(
@@ -75,25 +78,26 @@ class BuildAirquality extends StatelessWidget {
                   children: [
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            Icon(
-                              airQuality <= 50 ? Icons.water_drop : airQuality <= 100 ? Icons.water_drop_outlined : Icons.warning,
+                      child: Row(
+                        children: [
+                          Icon(
+                            airQuality <= 50
+                                ? Icons.water_drop
+                                : airQuality <= 100
+                                    ? Icons.water_drop_outlined
+                                    : Icons.warning,
+                            color: Colors.white.withOpacity(0.8),
+                            size: 16,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Kualitas Udara',
+                            style: TextStyle(
                               color: Colors.white.withOpacity(0.8),
-                              size: 16,
+                              fontSize: 14,
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Kualitas Udara',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
                     const SizedBox(height: 20),
@@ -103,14 +107,14 @@ class BuildAirquality extends StatelessWidget {
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: '${airQuality}',
+                              text: '$airQuality',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.8),
                                 fontSize: 24,
                               ),
                             ),
                             TextSpan(
-                              text: 'μg/m³',
+                              text: ' μg/m³',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.8),
                                 fontSize: 14,
@@ -124,7 +128,7 @@ class BuildAirquality extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
-                        getAirQualityDescription(airQuality),
+                        'Kualitas udara saat ini: $airQualityLevel. $airQualityMessage',
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.8),
                           fontSize: 12,
