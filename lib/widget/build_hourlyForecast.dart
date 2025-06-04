@@ -76,7 +76,7 @@ class _BuildForecastWithTemperatureDiagramState extends State<BuildForecastWithT
       future: loadAllWeatherData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: Colors.white));
         }
 
         if (snapshot.hasError) {

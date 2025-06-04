@@ -1,15 +1,15 @@
-import 'dart:convert';
 import 'dart:ui';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class BuildDailyRainSum extends StatelessWidget {
+  final Map<String, dynamic> weatherData;
+  const BuildDailyRainSum({super.key, required this.weatherData});
+
   Future<Map<String, dynamic>> loadRainData() async {
     try {
-      final String jsonString = await rootBundle.loadString('assets/json/dummy2.json');
-      final data = json.decode(jsonString);
+      final data = weatherData;
 
       // Ambil waktu sekarang dalam format yang sesuai dengan format hourly
       final String now = DateFormat("yyyy-MM-ddTHH:00").format(DateTime.now());
@@ -51,7 +51,7 @@ class BuildDailyRainSum extends StatelessWidget {
       future: loadRainData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: Colors.white));
         }
 
         if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {

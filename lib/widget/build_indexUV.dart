@@ -1,19 +1,20 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:intl/intl.dart';
 
 class BuildIndexUV extends StatelessWidget {
-  const BuildIndexUV({super.key});
+  final Map<String, dynamic> weatherData;
+  const BuildIndexUV({super.key, required this.weatherData});
 
   Future<int> loadUvIndex() async {
     try {
-      final String response = await rootBundle.loadString('assets/json/dummy2.json');
-      final data = json.decode(response);
+      final data = weatherData;
+
       final now = DateFormat("yyyy-MM-ddTHH:00").format(DateTime.now());
       final hourlyTimes = List<String>.from(data["hourly"]["time"]);
       final indexNow = hourlyTimes.indexOf(now);
+
       final uvIndex = data["hourly"]["uv_index"][indexNow];
       return uvIndex.toInt();
     } catch (e) {
@@ -44,7 +45,7 @@ class BuildIndexUV extends StatelessWidget {
       future: loadUvIndex(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: Colors.white));
         } else if (snapshot.hasError) {
           return const Center(child: Text('Gagal load data UV', style: TextStyle(color: Colors.white)));
         }

@@ -1,16 +1,15 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:intl/intl.dart';
 
 class BuildDailyHumidity extends StatelessWidget {
+  final Map<String, dynamic> weatherData;
+  const BuildDailyHumidity({super.key, required this.weatherData});
+
   Future<Map<String, dynamic>> loadAllWeatherData() async {
     try {
-      final String response = await rootBundle.loadString(
-        'assets/json/dummy2.json',
-      );
-      final data = json.decode(response);
+      final data = weatherData;
 
       final now = DateFormat("yyyy-MM-ddTHH:00").format(DateTime.now());
       final hourlyTimes = data["hourly"]["time"] as List;
@@ -45,7 +44,7 @@ class BuildDailyHumidity extends StatelessWidget {
       future: loadAllWeatherData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: Colors.white));
         } else if (snapshot.hasError) {
           return Center(
             child: Text(

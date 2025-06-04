@@ -8,10 +8,12 @@ import 'dart:ui';
 import 'package:intl/intl.dart';
 
 class BuildWeathercards extends StatelessWidget {
+  final Map<String, dynamic> weatherData;
+  const BuildWeathercards({super.key, required this.weatherData});
+
   Future<Map<String, dynamic>> loadAllWeatherData() async {
     try {
-      final String response = await rootBundle.loadString('assets/json/dummy2.json');
-      final data = json.decode(response);
+      final data = weatherData;
 
       final String mappingResponse = await rootBundle.loadString('assets/json/weather_code.json');
       final Map<String, dynamic> mappingData = json.decode(mappingResponse);
@@ -73,7 +75,7 @@ class BuildWeathercards extends StatelessWidget {
       future: loadAllWeatherData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: Colors.white));
         } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
           // fallback UI pas data gagal di-load
           return Center(

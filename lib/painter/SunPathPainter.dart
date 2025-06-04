@@ -37,7 +37,7 @@ class _SunPathProgressState extends State<SunPathProgress> {
   @override
   Widget build(BuildContext context) {
     if (sunrise == null || sunset == null) {
-      return const Center(child: CircularProgressIndicator());
+      return const Center(child: CircularProgressIndicator(color: Colors.white));
     }
     return Container(
       decoration: BoxDecoration(border: Border(bottom: BorderSide(color: Colors.white.withOpacity(0.5), width: 3))),

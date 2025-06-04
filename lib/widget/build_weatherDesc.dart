@@ -4,9 +4,11 @@ import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class BuildWeatherdescription extends StatelessWidget {
+  final Map<String, dynamic> weatherData;
+  const BuildWeatherdescription({super.key, required this.weatherData});
+
   Future<Map<String, dynamic>> _loadWeatherData() async {
-    final String response = await rootBundle.loadString('assets/json/dummy2.json');
-    final data = json.decode(response);
+    final data = weatherData;
 
     // ambil waktu lokal sekarang dalam format yang cocok dengan hourly time
     final now = DateFormat("yyyy-MM-ddTHH:00").format(DateTime.now());
@@ -47,7 +49,7 @@ class BuildWeatherdescription extends StatelessWidget {
       future: _loadWeatherData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator();
+          return const CircularProgressIndicator(color: Colors.white);
         } else if (snapshot.hasError) {
           return const Text('Error ngambil data cuaca');
         } else {

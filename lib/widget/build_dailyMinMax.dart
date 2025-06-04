@@ -6,11 +6,12 @@ import 'dart:ui';
 import 'package:intl/intl.dart';
 
 class BuildDailyminmax extends StatelessWidget {
+  final Map<String, dynamic> weatherData;
+  const BuildDailyminmax({super.key, required this.weatherData});
+
   Future<Map<String, dynamic>> loadAllWeatherData() async {
     try {
-      // Load JSON dummy data
-      final String response = await rootBundle.loadString('assets/json/dummy2.json');
-      final data = json.decode(response);
+      final data = weatherData;
 
       // Load weather code mapping
       final String mappingResponse = await rootBundle.loadString('assets/json/weather_code.json');
@@ -75,7 +76,7 @@ class BuildDailyminmax extends StatelessWidget {
       future: loadAllWeatherData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: Colors.white));
         } else if (snapshot.hasError) {
           return Center(
             child: Column(

@@ -1,16 +1,13 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:intl/intl.dart';
+import 'package:weather_app/services/getAirQualityApi.dart';
 
 class BuildAirquality extends StatelessWidget {
   Future<Map<String, dynamic>> loadAllWeatherData() async {
     try {
-      final String response = await rootBundle.loadString(
-        'assets/json/dummy.json',
-      );
-      final data = json.decode(response);
+      final data = await AirApiService.fetchWeatherData();
 
       final now = DateFormat("yyyy-MM-ddTHH:00").format(DateTime.now());
       final hourlyTimes = data["hourly"]["time"] as List;
@@ -49,7 +46,7 @@ class BuildAirquality extends StatelessWidget {
       future: loadAllWeatherData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: Colors.white));
         } else if (snapshot.hasError) {
           return Center(
             child: Text(

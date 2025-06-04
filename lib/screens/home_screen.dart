@@ -15,6 +15,7 @@ import 'package:weather_app/widget/build_risenset.dart';
 import 'package:weather_app/widget/build_temperature.dart';
 import 'package:weather_app/widget/build_weatherCards.dart';
 import 'package:weather_app/widget/build_weatherDesc.dart';
+import 'package:weather_app/services/getWeatherApi.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -24,13 +25,16 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  /// Ambil kode cuaca terbaru dari dummy2.json (hourly)
-  Future<int> _getLatestWeatherCode() async {
-    // https://api.open-meteo.com/v1/forecast?latitude=-7.3993&longitude=108.2607&daily=weather_code,sunset,sunrise,temperature_2m_min,temperature_2m_max,rain_sum,wind_speed_10m_mean,wind_gusts_10m_mean,cloud_cover_mean&hourly=temperature_2m,weather_code,wind_speed_10m,wind_direction_10m,relative_humidity_2m,cloud_cover,precipitation,precipitation_probability,uv_index&current=weather_code,is_day,temperature_2m&timezone=auto
-    // https://air-quality-api.open-meteo.com/v1/air-quality?latitude=-7.3993&longitude=108.2607&hourly=us_aqi_pm2_5&timezone=auto
-    final jsonString = await rootBundle.loadString('assets/json/dummy2.json');
-    final data = json.decode(jsonString);
+  late Future<Map<String, dynamic>> _weatherDataFuture;
 
+  @override
+  void initState() {
+    super.initState();
+    _weatherDataFuture = ApiService.fetchWeatherData();
+  }
+  
+  Future<int> _getLatestWeatherCode() async {
+    final data = await _weatherDataFuture;
     final List<dynamic> times = data['hourly']['time'];
     final List<dynamic> weatherCodes = data['hourly']['weather_code'];
 
@@ -62,126 +66,135 @@ class _HomeScreenState extends State<HomeScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder<int>(
-      future: _getLatestWeatherCode(),
-      builder: (context, weatherSnapshot) {
-        if (weatherSnapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+    return FutureBuilder<Map<String, dynamic>>(
+      future: _weatherDataFuture,
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return const Center(child: CircularProgressIndicator(color: Colors.white));
         }
 
-        if (weatherSnapshot.hasError || !weatherSnapshot.hasData) {
-          return const Center(child: Text('Error loading weather code'));
+        if (snapshot.hasError || !snapshot.hasData) {
+          return const Center(child: Text('Error loading weather data'));
         }
 
-        final int weatherCode = weatherSnapshot.data!;
+        final weatherData = snapshot.data!;
 
-        return FutureBuilder<String?>(
-          future: _getWeatherDescription(weatherCode),
-          builder: (context, descSnapshot) {
-            if (descSnapshot.connectionState == ConnectionState.waiting) {
-              return const Center(child: CircularProgressIndicator());
+        return FutureBuilder<int>(
+          future: _getLatestWeatherCode(),
+          builder: (context, weatherSnapshot) {
+            if (weatherSnapshot.connectionState == ConnectionState.waiting) {
+              return const Center(child: CircularProgressIndicator(color: Colors.white));
             }
 
-            if (descSnapshot.hasError || !descSnapshot.hasData) {
-              return const Center(child: Text('Error loading weather description'));
+            if (weatherSnapshot.hasError || !weatherSnapshot.hasData) {
+              return const Center(child: Text('Error loading weather code'));
             }
 
-            final String description = descSnapshot.data!;
-            final String backgroundImage = getWeatherBackground(description);
+            final int weatherCode = weatherSnapshot.data!;
 
-            return Scaffold(
-              body: Stack(
-                fit: StackFit.expand,
-                children: [
-                  Image.asset(backgroundImage, fit: BoxFit.cover),
-                  Container(color: Colors.black.withOpacity(0.3)),
-                  SafeArea(
-                    child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-                      child: Column(
-                        crossAxisAlignment: CrossAxisAlignment.center,
-                        children: [
-                          BuildHeader(),
-                          const SizedBox(height: 200),
-                          BuildTemperature(),
-                          const SizedBox(height: 8),
-                          BuildWeatherdescription(),
-                          const SizedBox(height: 20),
-                          BuildWeathercards(),
-                          const SizedBox(height: 24),
-                          BuildDailyminmax(),
-                          const SizedBox(height: 24),
+            return FutureBuilder<String?>(
+              future: _getWeatherDescription(weatherCode),
+              builder: (context, descSnapshot) {
+                if (descSnapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator(color: Colors.white));
+                }
 
-                          /// Rain & Wind
-                          IntrinsicHeight(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: BuildDailyRainSum(),
-                                  ),
+                if (descSnapshot.hasError || !descSnapshot.hasData) {
+                  return const Center(child: Text('Error loading weather description'));
+                }
+
+                final String description = descSnapshot.data!;
+                final String backgroundImage = getWeatherBackground(description);
+
+                return Scaffold(
+                  body: Stack(
+                    fit: StackFit.expand,
+                    children: [
+                      Image.asset(backgroundImage, fit: BoxFit.cover),
+                      Container(color: Colors.black.withOpacity(0.3)),
+                      SafeArea(
+                        child: SingleChildScrollView(
+                          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              BuildHeader(),
+                              const SizedBox(height: 200),
+                              BuildTemperature(weatherData: weatherData),
+                              const SizedBox(height: 8),
+                              BuildWeatherdescription(weatherData: weatherData),
+                              const SizedBox(height: 20),
+                              BuildWeathercards(weatherData: weatherData),
+                              const SizedBox(height: 24),
+                              BuildDailyminmax(weatherData: weatherData),
+                              const SizedBox(height: 24),
+                              IntrinsicHeight(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(right: 8.0),
+                                        child: BuildDailyRainSum(weatherData: weatherData),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 8.0),
+                                        child: BuildDailyWind(weatherData: weatherData),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 8.0),
-                                    child: BuildDailyWind(),
-                                  ),
+                              ),
+                              const SizedBox(height: 24),
+                              IntrinsicHeight(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(right: 8.0),
+                                        child: BuildAirquality(),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 8.0),
+                                        child: BuildIndexUV(weatherData: weatherData),
+                                      ),
+                                    ),
+                                  ],
                                 ),
-                              ],
-                            ),
+                              ),
+                              const SizedBox(height: 24),
+                              IntrinsicHeight(
+                                child: Row(
+                                  crossAxisAlignment: CrossAxisAlignment.stretch,
+                                  children: [
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(right: 8.0),
+                                        child: BuildDailyHumidity(weatherData: weatherData),
+                                      ),
+                                    ),
+                                    Expanded(
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(left: 8.0),
+                                        child: BuildSetnrise(weatherData: weatherData),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            ],
                           ),
-                          const SizedBox(height: 24),
-
-                          /// Air Quality & UV Index
-                          IntrinsicHeight(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: BuildAirquality(),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 8.0),
-                                    child: BuildIndexUV(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                          const SizedBox(height: 24),
-
-                          /// Humidity & Sunrise/Sunset
-                          IntrinsicHeight(
-                            child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.stretch,
-                              children: [
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(right: 8.0),
-                                    child: BuildDailyHumidity(),
-                                  ),
-                                ),
-                                Expanded(
-                                  child: Padding(
-                                    padding: const EdgeInsets.only(left: 8.0),
-                                    child: BuildSetnrise(),
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
+                        ),
                       ),
-                    ),
+                    ],
                   ),
-                ],
-              ),
+                );
+              },
             );
           },
         );

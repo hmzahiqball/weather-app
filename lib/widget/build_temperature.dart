@@ -1,15 +1,14 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
 
 class BuildTemperature extends StatelessWidget {
-  const BuildTemperature({super.key});
+  final Map<String, dynamic> weatherData;
+  const BuildTemperature({super.key, required this.weatherData});
 
   Future<int> _getCurrentTemperature() async {
     try {
-      final String jsonString = await rootBundle.loadString('assets/json/dummy2.json');
-      final Map<String, dynamic> jsonData = json.decode(jsonString);
+      final jsonData = weatherData;
 
       final now = DateFormat("yyyy-MM-ddTHH:00").format(DateTime.now());
       final List<dynamic> hourlyTime = jsonData["hourly"]["time"];

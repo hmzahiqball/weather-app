@@ -1,4 +1,3 @@
-import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'dart:ui';
@@ -6,12 +5,12 @@ import 'package:intl/intl.dart';
 import 'package:weather_app/painter/SunPathPainter.dart';
 
 class BuildSetnrise extends StatelessWidget {
+  final Map<String, dynamic> weatherData;
+  const BuildSetnrise({super.key, required this.weatherData});
+
   Future<Map<String, dynamic>> loadAllWeatherData() async {
     try {
-      final String response = await rootBundle.loadString(
-        'assets/json/dummy2.json',
-      );
-      final data = json.decode(response);
+      final data = weatherData;
 
       // ambil tanggal hari ini dalam format yang cocok dengan daily time
       final today = DateFormat("yyyy-MM-dd").format(DateTime.now());
@@ -38,7 +37,7 @@ class BuildSetnrise extends StatelessWidget {
       future: loadAllWeatherData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator());
+          return const Center(child: CircularProgressIndicator(color: Colors.white));
         } else if (snapshot.hasError) {
           return Center(
             child: Text(
