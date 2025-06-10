@@ -1,8 +1,6 @@
 import 'dart:convert';
-
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show rootBundle;
-
 import 'package:weather_app/utils/getBackgroundWeather.dart';
 import 'package:weather_app/widget/build_airQuality.dart';
 import 'package:weather_app/widget/build_dailyHumidity.dart';
@@ -30,9 +28,21 @@ class _HomeScreenState extends State<HomeScreen> {
   @override
   void initState() {
     super.initState();
-    _weatherDataFuture = ApiService.fetchWeatherData();
+    _weatherDataFuture = _loadWeatherData();
   }
-  
+
+  Future<Map<String, dynamic>> _loadWeatherData() async {
+    // Coba ambil data dari cache
+    Map<String, dynamic>? cachedData = await ApiService.getCachedWeatherData();
+    
+    // Jika tidak ada data di cache, ambil dari API
+    if (cachedData != null) {
+      return cachedData;
+    } else {
+      return await ApiService.fetchWeatherData();
+    }
+  }
+
   Future<int> _getLatestWeatherCode() async {
     final data = await _weatherDataFuture;
     final List<dynamic> times = data['hourly']['time'];
@@ -50,7 +60,6 @@ class _HomeScreenState extends State<HomeScreen> {
     return weatherCodes[latestIndex];
   }
 
-  /// Ambil deskripsi berdasarkan kode cuaca dari weather_code.json
   Future<String?> _getWeatherDescription(int weatherCode) async {
     final jsonString = await rootBundle.loadString('assets/json/weather_code.json');
     final Map<String, dynamic> data = json.decode(jsonString);

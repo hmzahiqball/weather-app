@@ -103,14 +103,15 @@ class BuildDailyRainSum extends StatelessWidget {
                                   Colors.white.withOpacity(0.0),
                                 ],
                                 stops: [0.6, 1],
-                                tileMode: TileMode.mirror,
                               ).createShader(bounds);
                             },
-                            child: Text(
-                              'Curah Hujan Kumulatif',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 14,
+                            child: Container(
+                              child: Text(
+                                'Curah Hujan Kumulatif',
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.8),
+                                  fontSize: 14,
+                                ),
                               ),
                             ),
                           ),

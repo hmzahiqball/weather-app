@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:weather_app/services/getLocationApi.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ApiService {
   static const String _baseUrl = 'https://api.open-meteo.com/v1/forecast';
@@ -11,21 +12,37 @@ class ApiService {
     String current = 'weather_code,is_day,temperature_2m',
     String timezone = 'auto',
   }) async {
-    final lokasi = await LocationService.getLocation(); // Ambil lat & lon otomatis
-    final latitude = lokasi.latitude;
-    final longitude = lokasi.longitude;
+    final ({double latitude, double longitude, String city}) lokasi =
+        await LocationService.getCachedLocation() ??
+            await LocationService.getLocation();
 
     final url = Uri.parse(
-      '$_baseUrl?latitude=$latitude&longitude=$longitude'
+      '$_baseUrl?latitude=${lokasi.latitude}&longitude=${lokasi.longitude}'
       '&daily=$daily&hourly=$hourly&current=$current&timezone=$timezone',
     );
 
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      return json.decode(response.body) as Map<String, dynamic>;
+      final weatherData = json.decode(response.body) as Map<String, dynamic>;
+      await _saveToCache(weatherData);
+      return weatherData;
     } else {
       throw Exception('Failed to load weather data');
     }
+  }
+
+  static Future<void> _saveToCache(Map<String, dynamic> data) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('weatherData', json.encode(data));
+  }
+
+  static Future<Map<String, dynamic>?> getCachedWeatherData() async {
+    final prefs = await SharedPreferences.getInstance();
+    final String? weatherDataString = prefs.getString('weatherData');
+    if (weatherDataString != null) {
+      return json.decode(weatherDataString) as Map<String, dynamic>;
+    }
+    return null;
   }
 }

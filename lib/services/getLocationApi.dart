@@ -2,12 +2,14 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LocationService {
   static Future<({double latitude, double longitude, String city})> getLocation() async {
     try {
       final position = await _getCurrentPosition();
       final city = await _getCityFromCoordinates(position.latitude, position.longitude);
+      await _saveLocationToCache(position.latitude, position.longitude, city); // Simpan ke cache
 
       return (latitude: position.latitude, longitude: position.longitude, city: city);
     } catch (e) {
@@ -19,6 +21,7 @@ class LocationService {
         final double latitude = data['lat'];
         final double longitude = data['lon'];
         final city = await _getCityFromCoordinates(latitude, longitude);
+        await _saveLocationToCache(latitude, longitude, city); // Simpan ke cache
 
         return (latitude: latitude, longitude: longitude, city: city);
       } catch (e) {
@@ -26,6 +29,13 @@ class LocationService {
         return (latitude: 0.0, longitude: 0.0, city: 'Unknown');
       }
     }
+  }
+
+  static Future<void> _saveLocationToCache(double latitude, double longitude, String city) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setDouble('latitude', latitude);
+    await prefs.setDouble('longitude', longitude);
+    await prefs.setString('city', city);
   }
 
   static Future<Position> _getCurrentPosition() async {
@@ -54,7 +64,7 @@ class LocationService {
       final url =
           'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=$lat&longitude=$lon&localityLanguage=id';
 
-      final response = await http.get(Uri.parse(url));
+      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return data['city'] ?? 'Kota tidak ditemukan';
@@ -65,5 +75,17 @@ class LocationService {
       debugPrint('❌ Error saat ambil kota dari koordinat: $e');
       return 'Error';
     }
+  }
+
+  static Future<({double latitude, double longitude, String city})?> getCachedLocation() async {
+    final prefs = await SharedPreferences.getInstance();
+    final double? latitude = prefs.getDouble('latitude');
+    final double? longitude = prefs.getDouble('longitude');
+    final String? city = prefs.getString('city');
+
+    if (latitude != null && longitude != null && city != null) {
+      return (latitude: latitude, longitude: longitude, city: city);
+    }
+    return null;
   }
 }
