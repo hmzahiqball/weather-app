@@ -3,38 +3,66 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:weather_app/painter/TemperaturePainter.dart';
 import 'package:weather_app/utils/getIconDataFromString.dart';
+import 'package:weather_app/widget/build_shimmerEffect.dart';
 
 class BuildForecastWithTemperatureDiagram extends StatefulWidget {
   @override
-  _BuildForecastWithTemperatureDiagramState createState() => _BuildForecastWithTemperatureDiagramState();
+  _BuildForecastWithTemperatureDiagramState createState() =>
+      _BuildForecastWithTemperatureDiagramState();
 }
 
-class _BuildForecastWithTemperatureDiagramState extends State<BuildForecastWithTemperatureDiagram> {
+class _BuildForecastWithTemperatureDiagramState
+    extends State<BuildForecastWithTemperatureDiagram> {
   final ScrollController _scrollController = ScrollController();
   final double itemWidth = 60.0;
 
   Future<Map<String, dynamic>> loadAllWeatherData() async {
     try {
-      final String response = await rootBundle.loadString('assets/json/dummy2.json');
+      final String response = await rootBundle.loadString(
+        'assets/json/dummy2.json',
+      );
       final data = json.decode(response);
 
-      final String mappingResponse = await rootBundle.loadString('assets/json/weather_code.json');
+      final String mappingResponse = await rootBundle.loadString(
+        'assets/json/weather_code.json',
+      );
       final Map<String, dynamic> mappingData = json.decode(mappingResponse);
 
       final List<String> allTimeRaw = List<String>.from(data["hourly"]["time"]);
-      final List<String> allTime = allTimeRaw.map((time) => time.split('T').last).toList();
+      final List<String> allTime =
+          allTimeRaw.map((time) => time.split('T').last).toList();
 
-      final List<int> allWeather = List<int>.from(data["hourly"]["weather_code"]);
-      final List<int> allTemp = List<num>.from(data["hourly"]["temperature_2m"]).map((e) => e.round()).toList();
+      final List<int> allWeather = List<int>.from(
+        data["hourly"]["weather_code"],
+      );
+      final List<int> allTemp =
+          List<num>.from(
+            data["hourly"]["temperature_2m"],
+          ).map((e) => e.round()).toList();
 
-      final List<dynamic> weatherCodeMapping = mappingData["weather_code_mapping"];
-      final matchedWeather = allWeather.map((code) =>
-        weatherCodeMapping.firstWhere((entry) => entry["code"] == code, orElse: () => {"desc": "Tidak diketahui"})["desc"]
-      ).toList();
+      final List<dynamic> weatherCodeMapping =
+          mappingData["weather_code_mapping"];
+      final matchedWeather =
+          allWeather
+              .map(
+                (code) =>
+                    weatherCodeMapping.firstWhere(
+                      (entry) => entry["code"] == code,
+                      orElse: () => {"desc": "Tidak diketahui"},
+                    )["desc"],
+              )
+              .toList();
 
-      final matchedIcon = allWeather.map((code) =>
-        weatherCodeMapping.firstWhere((entry) => entry["code"] == code, orElse: () => {"icon": "Tidak diketahui"})["icon"]
-      ).toList();
+      final matchedIcon =
+          allWeather
+              .map(
+                (code) =>
+                    weatherCodeMapping.firstWhere(
+                      (entry) => entry["code"] == code,
+                      orElse: () => {"icon": "Tidak diketahui"},
+                    )["icon"],
+              )
+              .toList();
 
       return {
         "allTime": allTime,
@@ -44,12 +72,7 @@ class _BuildForecastWithTemperatureDiagramState extends State<BuildForecastWithT
       };
     } catch (e, stackTrace) {
       debugPrint('❌ Gagal load data cuaca: $e\n$stackTrace');
-      return {
-        "allTime": [],
-        "allWeather": [],
-        "allIcon": [],
-        "allTemp": [],
-      };
+      return {"allTime": [], "allWeather": [], "allIcon": [], "allTemp": []};
     }
   }
 
@@ -76,18 +99,22 @@ class _BuildForecastWithTemperatureDiagramState extends State<BuildForecastWithT
       future: loadAllWeatherData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: Colors.white));
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: shimmerBox(width: double.infinity, height: 200),
+          );
         }
 
         if (snapshot.hasError) {
           return const Center(child: Text('Gagal memuat data.'));
         }
-
+        
         final data = snapshot.data!;
         final List<String> allTime = List<String>.from(data["allTime"]);
         final List<String> allWeather = List<String>.from(data["allWeather"]);
         final List<String> allIconn = List<String>.from(data["allIcon"]);
-        final List<IconData> allIcon = allIconn.map<IconData>((e) => getIconDataFromString(e)).toList();
+        final List<IconData> allIcon =
+            allIconn.map<IconData>((e) => getIconDataFromString(e)).toList();
         final List<int> allTemp = List<int>.from(data["allTemp"]);
 
         final double totalWidth = itemWidth * allTime.length;
@@ -139,17 +166,27 @@ class _BuildForecastWithTemperatureDiagramState extends State<BuildForecastWithT
                           child: Column(
                             mainAxisAlignment: MainAxisAlignment.center,
                             children: [
-                              Icon(allIcon[index], color: Colors.white.withOpacity(0.9), size: 24),
+                              Icon(
+                                allIcon[index],
+                                color: Colors.white.withOpacity(0.9),
+                                size: 24,
+                              ),
                               const SizedBox(height: 4),
                               Text(
                                 allWeather[index],
-                                style: TextStyle(color: Colors.white.withOpacity(0.9), fontSize: 12),
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.9),
+                                  fontSize: 12,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                               const SizedBox(height: 2),
                               Text(
                                 allTime[index],
-                                style: TextStyle(color: Colors.white.withOpacity(0.7), fontSize: 11),
+                                style: TextStyle(
+                                  color: Colors.white.withOpacity(0.7),
+                                  fontSize: 11,
+                                ),
                                 textAlign: TextAlign.center,
                               ),
                             ],
