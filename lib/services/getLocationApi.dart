@@ -20,7 +20,8 @@ class LocationService {
         final data = json.decode(response.body);
         final double latitude = data['lat'];
         final double longitude = data['lon'];
-        final city = await _getCityFromCoordinates(latitude, longitude);
+        final String city = data['city'];
+        // final city = await _getCityFromCoordinates(latitude, longitude);
         await _saveLocationToCache(latitude, longitude, city); // Simpan ke cache
 
         return (latitude: latitude, longitude: longitude, city: city);
@@ -64,7 +65,7 @@ class LocationService {
       final url =
           'https://api.bigdatacloud.net/data/reverse-geocode-client?latitude=$lat&longitude=$lon&localityLanguage=id';
 
-      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 10));
+      final response = await http.get(Uri.parse(url)).timeout(const Duration(seconds: 100));
       if (response.statusCode == 200) {
         final data = jsonDecode(response.body);
         return data['city'] ?? 'Kota tidak ditemukan';

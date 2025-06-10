@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:weather_app/services/getLocationApi.dart';
 
 class BuildHeader extends StatelessWidget {
@@ -20,9 +21,17 @@ class BuildHeader extends StatelessWidget {
             future: _getCityName(),
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Text(
-                  'Memuat lokasi...',
-                  style: TextStyle(color: Colors.white),
+                return Shimmer.fromColors(
+                  baseColor: Colors.grey[600]!,
+                  highlightColor: Colors.grey[400]!,
+                  child: Container(
+                    width: 120,
+                    height: 20,
+                    decoration: BoxDecoration(
+                      color: const Color.fromARGB(83, 58, 58, 58),
+                      borderRadius: BorderRadius.circular(5),
+                    ),
+                  ),
                 );
               } else if (snapshot.hasData) {
                 return Text(
