@@ -1,17 +1,20 @@
 import 'package:flutter/material.dart';
 import 'dart:ui';
+import 'package:weather_app/widget/build_shimmerEffect.dart';
 
 class BuildWeathercard extends StatelessWidget {
-  final String title;
-  final String temp;
-  final String description;
-  final IconData icon;
+  final String? title;
+  final String? temp;
+  final String? description;
+  final IconData? icon;
+  final bool isLoading;
 
   const BuildWeathercard({
-    required this.title,
-    required this.temp,
-    required this.description,
-    required this.icon,
+    this.title,
+    this.temp,
+    this.description,
+    this.icon,
+    this.isLoading = true,
   });
 
   @override
@@ -35,39 +38,47 @@ class BuildWeathercard extends StatelessWidget {
             children: [
               Row(
                 children: [
-                  Icon(
-                    icon,
-                    color: Colors.white.withOpacity(0.9),
-                    size: 18,
-                  ),
+                  isLoading
+                      ? shimmerBox(width: 18, height: 18)
+                      : Icon(
+                          icon,
+                          color: Colors.white.withOpacity(0.9),
+                          size: 18,
+                        ),
                   const SizedBox(width: 8),
-                  Text(
-                    title,
-                    style: TextStyle(
-                      color: Colors.white.withOpacity(0.9),
-                      fontSize: 14,
-                      fontWeight: FontWeight.w500,
-                    ),
-                  ),
+                  isLoading
+                      ? shimmerBox(width: 80, height: 14)
+                      : Text(
+                          title ?? '',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.9),
+                            fontSize: 14,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
                 ],
               ),
               const SizedBox(height: 8),
-              Text(
-                temp,
-                style: const TextStyle(
-                  color: Colors.white,
-                  fontSize: 17,
-                  fontWeight: FontWeight.w600,
-                ),
-              ),
+              isLoading
+                  ? shimmerBox(width: 60, height: 17)
+                  : Text(
+                      temp ?? '',
+                      style: const TextStyle(
+                        color: Colors.white,
+                        fontSize: 17,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
               const SizedBox(height: 4),
-              Text(
-                description,
-                style: TextStyle(
-                  color: Colors.white.withOpacity(0.8),
-                  fontSize: 12,
-                ),
-              ),
+              isLoading
+                  ? shimmerBox(width: 100, height: 12)
+                  : Text(
+                      description ?? '',
+                      style: TextStyle(
+                        color: Colors.white.withOpacity(0.8),
+                        fontSize: 12,
+                      ),
+                    ),
             ],
           ),
         ),

@@ -142,14 +142,18 @@ class BuildWeathercards extends StatelessWidget {
                           padding: const EdgeInsets.symmetric(horizontal: 20),
                           itemCount: 7,
                           itemBuilder: (context, index) {
+                            final isLoading = snapshot.connectionState == ConnectionState.waiting ||
+                                !snapshot.hasData || snapshot.data!.isEmpty;
+                          
                             return Container(
                               width: 160,
                               margin: EdgeInsets.only(right: index < 6 ? 12 : 0),
                               child: BuildWeathercard(
-                                title: snapshot.data!["allTime"][index],
-                                temp: "${snapshot.data!["allMin"][index]}°/${snapshot.data!["allMax"][index]}°",
-                                description: snapshot.data!["allWeather"][index],
-                                icon: getIconDataFromString(snapshot.data!["allIcon"][index]),
+                                isLoading: isLoading,
+                                title: isLoading ? null : snapshot.data!["allTime"][index],
+                                temp: isLoading ? null : "${snapshot.data!["allMin"][index]}°/${snapshot.data!["allMax"][index]}°",
+                                description: isLoading ? null : snapshot.data!["allWeather"][index],
+                                icon: isLoading ? null : getIconDataFromString(snapshot.data!["allIcon"][index]),
                               ),
                             );
                           },

@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
+import 'package:weather_app/widget/build_shimmerEffect.dart';
 
 class BuildTemperature extends StatelessWidget {
   final Map<String, dynamic> weatherData;
@@ -34,18 +34,7 @@ class BuildTemperature extends StatelessWidget {
       future: _getCurrentTemperature(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return Shimmer.fromColors(
-            baseColor: Colors.grey[600]!,
-            highlightColor: Colors.grey[400]!,
-            child: Container(
-              width: 120,
-              height: 120,
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(83, 58, 58, 58),
-                borderRadius: BorderRadius.circular(5),
-              ),
-            ),
-          );
+          return shimmerBox(width: 120, height: 120);
         } else if (snapshot.hasData) {
           return Container(
             margin: const EdgeInsets.only(left: 40),

@@ -2,7 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
-import 'package:shimmer/shimmer.dart';
+import 'package:weather_app/widget/build_shimmerEffect.dart';
 
 class BuildWeatherdescription extends StatelessWidget {
   final Map<String, dynamic> weatherData;
@@ -52,31 +52,10 @@ class BuildWeatherdescription extends StatelessWidget {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Column(
             children: [
-              Shimmer.fromColors(
-                baseColor: Colors.grey[600]!,
-                highlightColor: Colors.grey[400]!,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.5,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(83, 58, 58, 58),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-              ),
+              shimmerBox(width: MediaQuery.of(context).size.width * 0.5, height: 20),
               const SizedBox(height: 4),
-              Shimmer.fromColors(
-                baseColor: Colors.grey[600]!,
-                highlightColor: Colors.grey[400]!,
-                child: Container(
-                  width: MediaQuery.of(context).size.width * 0.7,
-                  height: 20,
-                  decoration: BoxDecoration(
-                    color: const Color.fromARGB(83, 58, 58, 58),
-                    borderRadius: BorderRadius.circular(5),
-                  ),
-                ),
-              ),
+              
+              shimmerBox(width: MediaQuery.of(context).size.width * 0.7, height: 20),
             ],
           );
         } else if (snapshot.hasError) {
