@@ -35,19 +35,6 @@ class BuildTemperature extends StatelessWidget {
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Shimmer.fromColors(
-            baseColor: const Color.fromARGB(83, 58, 58, 58),
-            highlightColor: const Color.fromARGB(83, 58, 58, 58),
-            child: const Text(
-              '____',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 80,
-                fontWeight: FontWeight.w200,
-              ),
-            ),
-          );
-        } else if (snapshot.hasData) {
-          return Shimmer.fromColors(
             baseColor: Colors.grey[600]!,
             highlightColor: Colors.grey[400]!,
             child: Container(
@@ -56,6 +43,18 @@ class BuildTemperature extends StatelessWidget {
               decoration: BoxDecoration(
                 color: const Color.fromARGB(83, 58, 58, 58),
                 borderRadius: BorderRadius.circular(5),
+              ),
+            ),
+          );
+        } else if (snapshot.hasData) {
+          return Container(
+            margin: const EdgeInsets.only(left: 40),
+            child: Text(
+              '${snapshot.data}°',
+              style: const TextStyle(
+                color: Colors.white,
+                fontSize: 80,
+                fontWeight: FontWeight.w200,
               ),
             ),
           );
