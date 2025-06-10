@@ -71,7 +71,6 @@ This project is still a **work in progress**. Expect bugs, incomplete features, 
 - Device Optimization
 - Multi-language support (English & more)
 - Better error handling for network failures
-- Offline weather caching
 - User-selectable locations
 
 ---
