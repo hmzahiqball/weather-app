@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:intl/intl.dart';
+import 'package:shimmer/shimmer.dart';
 
 class BuildWeatherdescription extends StatelessWidget {
   final Map<String, dynamic> weatherData;
@@ -49,7 +50,35 @@ class BuildWeatherdescription extends StatelessWidget {
       future: _loadWeatherData(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator(color: Colors.white);
+          return Column(
+            children: [
+              Shimmer.fromColors(
+                baseColor: Colors.grey[600]!,
+                highlightColor: Colors.grey[400]!,
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.5,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(83, 58, 58, 58),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 4),
+              Shimmer.fromColors(
+                baseColor: Colors.grey[600]!,
+                highlightColor: Colors.grey[400]!,
+                child: Container(
+                  width: MediaQuery.of(context).size.width * 0.7,
+                  height: 20,
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(83, 58, 58, 58),
+                    borderRadius: BorderRadius.circular(5),
+                  ),
+                ),
+              ),
+            ],
+          );
         } else if (snapshot.hasError) {
           return const Text('Error ngambil data cuaca');
         } else {
