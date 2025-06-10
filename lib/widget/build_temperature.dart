@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:shimmer/shimmer.dart';
 import 'package:intl/intl.dart';
 
 class BuildTemperature extends StatelessWidget {
@@ -33,16 +34,28 @@ class BuildTemperature extends StatelessWidget {
       future: _getCurrentTemperature(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
-          return const CircularProgressIndicator(color: Colors.white);
-        } else if (snapshot.hasData) {
-          return Container(
-            margin: const EdgeInsets.only(left: 40),
-            child: Text(
-              '${snapshot.data}°',
-              style: const TextStyle(
+          return Shimmer.fromColors(
+            baseColor: const Color.fromARGB(83, 58, 58, 58),
+            highlightColor: const Color.fromARGB(83, 58, 58, 58),
+            child: const Text(
+              '____',
+              style: TextStyle(
                 color: Colors.white,
                 fontSize: 80,
                 fontWeight: FontWeight.w200,
+              ),
+            ),
+          );
+        } else if (snapshot.hasData) {
+          return Shimmer.fromColors(
+            baseColor: Colors.grey[600]!,
+            highlightColor: Colors.grey[400]!,
+            child: Container(
+              width: 120,
+              height: 120,
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(83, 58, 58, 58),
+                borderRadius: BorderRadius.circular(5),
               ),
             ),
           );
