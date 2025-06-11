@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'package:weather_app/painter/DailyTemperaturePainter.dart';
 import 'package:weather_app/utils/getIconDataFromString.dart';
 import 'package:intl/intl.dart';
+import 'package:weather_app/widget/build_shimmerEffect.dart';
 
 class BuildForecastWithTemperatureDiagram extends StatelessWidget {
   final Map<String, dynamic> weatherData;
@@ -76,6 +77,16 @@ class BuildForecastWithTemperatureDiagram extends StatelessWidget {
     return FutureBuilder<Map<String, dynamic>>(
       future: loadAllWeatherData(),
       builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.waiting) {
+          return Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 20),
+            child: shimmerBox(width: double.infinity, height: 200),
+          );
+        }
+
+        if (snapshot.hasError) {
+          return const Center(child: Text('Gagal memuat data.'));
+        }
         if (snapshot.hasData) {
           final List<String> dayNames = List<String>.from(snapshot.data!["dayNames"]);
           final List<int> tempMin = List<int>.from(snapshot.data!["tempMin"]);

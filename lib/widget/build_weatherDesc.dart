@@ -54,7 +54,6 @@ class BuildWeatherdescription extends StatelessWidget {
             children: [
               shimmerBox(width: MediaQuery.of(context).size.width * 0.5, height: 20),
               const SizedBox(height: 4),
-              
               shimmerBox(width: MediaQuery.of(context).size.width * 0.7, height: 20),
             ],
           );
