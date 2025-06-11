@@ -50,19 +50,6 @@ class BuildDailyRainSum extends StatelessWidget {
     return FutureBuilder<Map<String, dynamic>>(
       future: loadRainData(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: Colors.white));
-        }
-
-        if (snapshot.hasError || snapshot.data == null || snapshot.data!.isEmpty) {
-          return const Center(
-            child: Text(
-              'Gagal memuat data hujan',
-              style: TextStyle(color: Colors.white),
-            ),
-          );
-        }
-
         final double rainSum = snapshot.data!["rainSum"] ?? 0.0;
         final int rainProbability = snapshot.data!["rainProbability"] ?? 0;
 
@@ -122,43 +109,63 @@ class BuildDailyRainSum extends StatelessWidget {
                   const SizedBox(height: 20),
 
                   // Value Display
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: RichText(
-                      text: TextSpan(
+                  if (snapshot.connectionState == ConnectionState.waiting)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
                         children: [
-                          TextSpan(
-                            text: rainSum.toStringAsFixed(1),
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              fontSize: 24,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                          TextSpan(
-                            text: ' mm | $rainProbability%',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              fontSize: 14,
-                            ),
-                          ),
+                          shimmerBox(width: MediaQuery.of(context).size.width * 0.7, height: 20),
+                          const SizedBox(height: 16),
+                          shimmerBox(width: double.infinity, height: 60),
                         ],
                       ),
-                    ),
-                  ),
-                  const SizedBox(height: 16),
-
-                  // Description
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 20),
-                    child: Text(
-                      getRainDescription(rainSum),
-                      style: TextStyle(
-                        color: Colors.white.withOpacity(0.8),
-                        fontSize: 12,
+                    )
+                  else if (snapshot.hasError)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        'Gagal memuat data hujan',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
+                  else if (snapshot.hasData)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: RichText(
+                        text: TextSpan(
+                          children: [
+                            TextSpan(
+                              text: rainSum.toStringAsFixed(1),
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 24,
+                                fontWeight: FontWeight.bold,
+                              ),
+                            ),
+                            TextSpan(
+                              text: ' mm | $rainProbability%',
+                              style: TextStyle(
+                                color: Colors.white.withOpacity(0.8),
+                                fontSize: 14,
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
-                  ),
+                    const SizedBox(height: 16),
+
+                    // Description
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        getRainDescription(rainSum),
+                        style: TextStyle(
+                          color: Colors.white.withOpacity(0.8),
+                          fontSize: 12,
+                        ),
+                      ),
+                    ),
                 ],
               ),
             ),
