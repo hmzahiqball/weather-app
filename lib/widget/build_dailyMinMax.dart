@@ -121,7 +121,7 @@ class BuildDailyminmax extends StatelessWidget {
                     ),
                     const SizedBox(height: 24),
                     // Diagram suhu
-                    BuildForecastWithTemperatureDiagram(),
+                    BuildForecastWithTemperatureDiagram(weatherData: weatherData),
                   ],
                 ),
               ),

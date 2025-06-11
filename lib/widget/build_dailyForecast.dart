@@ -5,21 +5,15 @@ import 'package:weather_app/painter/DailyTemperaturePainter.dart';
 import 'package:weather_app/utils/getIconDataFromString.dart';
 import 'package:intl/intl.dart';
 
-class BuildForecastWithTemperatureDiagram extends StatefulWidget {
-  @override
-  _BuildForecastWithTemperatureDiagramState createState() =>
-      _BuildForecastWithTemperatureDiagramState();
-}
+class BuildForecastWithTemperatureDiagram extends StatelessWidget {
+  final Map<String, dynamic> weatherData;
+  BuildForecastWithTemperatureDiagram({super.key, required this.weatherData});
 
-class _BuildForecastWithTemperatureDiagramState
-    extends State<BuildForecastWithTemperatureDiagram> {
   final ScrollController _scrollController = ScrollController();
   final double itemWidth = 60.0;
 
   Future<Map<String, dynamic>> loadAllWeatherData() async {
-    final String response =
-        await rootBundle.loadString('assets/json/dummy2.json');
-    final data = json.decode(response);
+    final data = weatherData;
 
     final String mappingResponse =
         await rootBundle.loadString('assets/json/weather_code.json');
