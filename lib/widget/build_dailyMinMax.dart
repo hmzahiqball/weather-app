@@ -4,6 +4,7 @@ import 'package:flutter/services.dart';
 import 'build_dailyForecast.dart';
 import 'dart:ui';
 import 'package:intl/intl.dart';
+import 'package:weather_app/widget/build_shimmerEffect.dart';
 
 class BuildDailyminmax extends StatelessWidget {
   final Map<String, dynamic> weatherData;
@@ -75,61 +76,63 @@ class BuildDailyminmax extends StatelessWidget {
     return FutureBuilder<Map<String, dynamic>>(
       future: loadAllWeatherData(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: Colors.white));
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Column(
-              mainAxisSize: MainAxisSize.min,
-              children: [
-                Icon(Icons.error_outline, color: Colors.redAccent, size: 32),
-                const SizedBox(height: 8),
-                Text(
-                  'Gagal load data cuaca',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
-                ),
-              ],
-            ),
-          );
-        } else if (snapshot.hasData) {
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(40, 58, 58, 58),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(40, 58, 58, 58),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.white.withOpacity(0.2)),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: [
+                        Icon(Icons.calendar_month, color: Colors.white.withOpacity(0.8), size: 16),
+                        const SizedBox(width: 8),
+                        Text(
+                          '7 Hari Berikutnya',
+                          style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 24),
+                  if (snapshot.connectionState == ConnectionState.waiting) 
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
+                      child: shimmerBox(width: double.infinity, height: 200),
+                    )
+                  else if (snapshot.hasError) 
+                    Center(
+                      child: Column(
+                        mainAxisSize: MainAxisSize.min,
                         children: [
-                          Icon(Icons.calendar_month, color: Colors.white.withOpacity(0.8), size: 16),
-                          const SizedBox(width: 8),
+                          Icon(Icons.error_outline, color: Colors.redAccent, size: 32),
+                          const SizedBox(height: 8),
                           Text(
-                            '7 Hari Berikutnya',
-                            style: TextStyle(color: Colors.white.withOpacity(0.8), fontSize: 14),
+                            'Gagal load data cuaca',
+                            style: TextStyle(color: Colors.white, fontSize: 14),
                           ),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 24),
+                    )
+                  else if (snapshot.hasData) 
                     // Diagram suhu
-                    BuildForecastWithTemperatureDiagram(weatherData: weatherData),
-                  ],
-                ),
+                    BuildForecastWithTemperatureDiagram(weatherData: weatherData)
+                  else 
+                    const SizedBox(), // fallback
+                ],
               ),
             ),
-          );
-        } else {
-          return const SizedBox(); // fallback
-        }
+          ),
+        );
       },
     );
   }
