@@ -161,7 +161,7 @@ class BuildWeathercards extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 24),
-                    BuildForecastWithTemperatureDiagram(),
+                    BuildForecastWithTemperatureDiagram(weatherData: weatherData),
                     const SizedBox(height: 20),
                   ],
                 ),
