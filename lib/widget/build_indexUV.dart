@@ -83,7 +83,8 @@ class BuildIndexUV extends StatelessWidget {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 20),// Data utama
+                  const SizedBox(height: 20),
+                  // Data utama
                   if (snapshot.connectionState == ConnectionState.waiting)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
