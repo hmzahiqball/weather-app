@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:intl/intl.dart';
 import 'package:weather_app/services/getAirQualityApi.dart';

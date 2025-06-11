@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:intl/intl.dart';
 import 'package:weather_app/painter/SunPathPainter.dart';
+import 'package:weather_app/widget/build_shimmerEffect.dart';
 
 class BuildSetnrise extends StatelessWidget {
   final Map<String, dynamic> weatherData;
@@ -36,56 +36,66 @@ class BuildSetnrise extends StatelessWidget {
     return FutureBuilder(
       future: loadAllWeatherData(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: Colors.white));
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text(
-              'Error loading rain data',
-              style: TextStyle(color: Colors.white),
-            ),
-          );
-        } else {
-          final sunrise = snapshot.data?["sunrise"] ?? 00.00;
-          final sunset = snapshot.data?["sunset"] ?? 00.00;
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(40, 58, 58, 58),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: SingleChildScrollView(
-                        scrollDirection: Axis.horizontal,
-                        child: Row(
-                          children: [
-                            Icon(
-                              Icons.wb_sunny,
+        final sunrise = snapshot.data?["sunrise"] ?? 00.00;
+        final sunset = snapshot.data?["sunset"] ?? 00.00;
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(40, 58, 58, 58),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.white.withOpacity(0.2)),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: SingleChildScrollView(
+                      scrollDirection: Axis.horizontal,
+                      child: Row(
+                        children: [
+                          Icon(
+                            Icons.wb_sunny,
+                            color: Colors.white.withOpacity(0.8),
+                            size: 16,
+                          ),
+                          const SizedBox(width: 8),
+                          Text(
+                            'Sunrise - Sunset',
+                            style: TextStyle(
                               color: Colors.white.withOpacity(0.8),
-                              size: 16,
+                              fontSize: 14,
                             ),
-                            const SizedBox(width: 8),
-                            Text(
-                              'Sunrise - Sunset',
-                              style: TextStyle(
-                                color: Colors.white.withOpacity(0.8),
-                                fontSize: 14,
-                              ),
-                            ),
-                          ],
-                        ),
+                          ),
+                        ],
                       ),
                     ),
-                    const SizedBox(height: 20),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Value Display
+                  if (snapshot.connectionState == ConnectionState.waiting)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Column(
+                        children: [
+                          shimmerBox(width: double.infinity, height: 100),
+                        ],
+                      ),
+                    )
+                  else if (snapshot.hasError)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        'Gagal memuat data hujan',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
+                  else if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: SunPathProgress(),
@@ -109,11 +119,11 @@ class BuildSetnrise extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
+                ],
               ),
             ),
-          );
-        }
+          ),
+        );
       },
     );
   }
