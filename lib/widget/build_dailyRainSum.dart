@@ -50,9 +50,6 @@ class BuildDailyRainSum extends StatelessWidget {
     return FutureBuilder<Map<String, dynamic>>(
       future: loadRainData(),
       builder: (context, snapshot) {
-        final double rainSum = snapshot.data!["rainSum"] ?? 0.0;
-        final int rainProbability = snapshot.data!["rainProbability"] ?? 0;
-
         return ClipRRect(
           borderRadius: BorderRadius.circular(24),
           child: BackdropFilter(
@@ -128,14 +125,14 @@ class BuildDailyRainSum extends StatelessWidget {
                         style: TextStyle(color: Colors.white),
                       ),
                     )
-                  else if (snapshot.hasData)
+                  else if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: RichText(
                         text: TextSpan(
                           children: [
                             TextSpan(
-                              text: rainSum.toStringAsFixed(1),
+                              text: snapshot.data!["rainSum"].toStringAsFixed(1),
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.8),
                                 fontSize: 24,
@@ -143,7 +140,7 @@ class BuildDailyRainSum extends StatelessWidget {
                               ),
                             ),
                             TextSpan(
-                              text: ' mm | $rainProbability%',
+                              text: ' mm | ${snapshot.data!["rainProbability"]}%',
                               style: TextStyle(
                                 color: Colors.white.withOpacity(0.8),
                                 fontSize: 14,
@@ -159,13 +156,14 @@ class BuildDailyRainSum extends StatelessWidget {
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: Text(
-                        getRainDescription(rainSum),
+                        getRainDescription(snapshot.data!["rainSum"]),
                         style: TextStyle(
                           color: Colors.white.withOpacity(0.8),
                           fontSize: 12,
                         ),
                       ),
                     ),
+                  ],
                 ],
               ),
             ),
