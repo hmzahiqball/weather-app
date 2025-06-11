@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'dart:ui';
 import 'package:intl/intl.dart';
 import 'package:weather_app/services/getAirQualityApi.dart';
+import 'package:weather_app/widget/build_shimmerEffect.dart';
 
 class BuildAirquality extends StatelessWidget {
   Future<Map<String, dynamic>> loadAllWeatherData() async {
@@ -45,59 +46,70 @@ class BuildAirquality extends StatelessWidget {
     return FutureBuilder(
       future: loadAllWeatherData(),
       builder: (context, snapshot) {
-        if (snapshot.connectionState == ConnectionState.waiting) {
-          return const Center(child: CircularProgressIndicator(color: Colors.white));
-        } else if (snapshot.hasError) {
-          return Center(
-            child: Text(
-              'Error loading air quality data',
-              style: TextStyle(color: Colors.white),
-            ),
-          );
-        } else {
-          final airQuality = snapshot.data?["airQuality"] ?? 0;
-          final airQualityLevel = getAirQualityLevel(airQuality);
-          final airQualityMessage = getAirQualityMessage(airQuality);
-
-          return ClipRRect(
-            borderRadius: BorderRadius.circular(24),
-            child: BackdropFilter(
-              filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
-              child: Container(
-                decoration: BoxDecoration(
-                  color: const Color.fromARGB(40, 58, 58, 58),
-                  borderRadius: BorderRadius.circular(24),
-                  border: Border.all(color: Colors.white.withOpacity(0.2)),
-                ),
-                padding: const EdgeInsets.symmetric(vertical: 20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
+        final airQuality = snapshot.data?["airQuality"] ?? 0;
+        final airQualityLevel = getAirQualityLevel(airQuality);
+        final airQualityMessage = getAirQualityMessage(airQuality);
+        return ClipRRect(
+          borderRadius: BorderRadius.circular(24),
+          child: BackdropFilter(
+            filter: ImageFilter.blur(sigmaX: 15, sigmaY: 15),
+            child: Container(
+              decoration: BoxDecoration(
+                color: const Color.fromARGB(40, 58, 58, 58),
+                borderRadius: BorderRadius.circular(24),
+                border: Border.all(color: Colors.white.withOpacity(0.2)),
+              ),
+              padding: const EdgeInsets.symmetric(vertical: 20),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 20),
+                    child: Row(
+                      children: [
+                        Icon(
+                          airQuality <= 50
+                              ? Icons.water_drop
+                              : airQuality <= 100
+                                  ? Icons.water_drop_outlined
+                                  : Icons.warning,
+                          color: Colors.white.withOpacity(0.8),
+                          size: 16,
+                        ),
+                        const SizedBox(width: 8),
+                        Text(
+                          'Kualitas Udara',
+                          style: TextStyle(
+                            color: Colors.white.withOpacity(0.8),
+                            fontSize: 14,
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  
+                  // Data utama
+                  if (snapshot.connectionState == ConnectionState.waiting)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
-                      child: Row(
+                      child: Column(
                         children: [
-                          Icon(
-                            airQuality <= 50
-                                ? Icons.water_drop
-                                : airQuality <= 100
-                                    ? Icons.water_drop_outlined
-                                    : Icons.warning,
-                            color: Colors.white.withOpacity(0.8),
-                            size: 16,
-                          ),
-                          const SizedBox(width: 8),
-                          Text(
-                            'Kualitas Udara',
-                            style: TextStyle(
-                              color: Colors.white.withOpacity(0.8),
-                              fontSize: 14,
-                            ),
-                          ),
+                          shimmerBox(width: MediaQuery.of(context).size.width * 0.7, height: 20),
+                          const SizedBox(height: 16),
+                          shimmerBox(width: double.infinity, height: 60),
                         ],
                       ),
-                    ),
-                    const SizedBox(height: 20),
+                    )
+                  else if (snapshot.hasError)
+                    Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 20),
+                      child: Text(
+                        'Gagal memuat data hujan',
+                        style: TextStyle(color: Colors.white),
+                      ),
+                    )
+                  else if (snapshot.hasData && snapshot.data != null && snapshot.data!.isNotEmpty) ...[
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
                       child: RichText(
@@ -133,11 +145,11 @@ class BuildAirquality extends StatelessWidget {
                       ),
                     ),
                   ],
-                ),
+                ],
               ),
             ),
-          );
-        }
+          ),
+        );
       },
     );
   }

@@ -99,7 +99,6 @@ class BuildDailyWind extends StatelessWidget {
                   const SizedBox(height: 20),
                   
                   // Data utama
-                  // Value Display
                   if (snapshot.connectionState == ConnectionState.waiting)
                     Padding(
                       padding: const EdgeInsets.symmetric(horizontal: 20),
