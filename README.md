@@ -1,6 +1,6 @@
 # 🌤️ Flutter Weather App
 
-A simple yet powerful weather forecasting application built using Flutter, fetching real-time data from [Open-Meteo](https://open-meteo.com/) and IP-based location detection using [ip-api.com](http://ip-api.com/json/).
+A simple yet powerful weather forecasting application built using Flutter, design inspired by Infinix weather App, fetching real-time data from [Open-Meteo](https://open-meteo.com/) and IP-based location detection using [ip-api.com](http://ip-api.com/json/).
 
 > ⚠️ Language support is limited to **Bahasa Indonesia only** for now.
 
