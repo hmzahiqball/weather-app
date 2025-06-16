@@ -2,7 +2,7 @@
 
 A simple yet powerful weather forecasting application built using Flutter, fetching real-time data from [Open-Meteo](https://open-meteo.com/) and IP-based location detection using [ip-api.com](http://ip-api.com/json/).
 
-> ⚠️ This app is currently under active development. Language support is limited to **Bahasa Indonesia only** for now.
+> ⚠️ Language support is limited to **Bahasa Indonesia only** for now.
 
 ---
 
